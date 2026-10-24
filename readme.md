@@ -4,12 +4,12 @@ A software system for managing healthcare appointments and maintaining patient m
 
 ## Contributors
 
-| Name | PES ID |
-|---|---|
-| Sairam Charan N | PES1UG24AM240 |
-| Sanketh Shivaji R | PES1UG24AM251 |
-| Santhosh M | PES1UG24AM252 |
-| Sumukh D Hegde | PES1UG24AM293 |
+| PES ID |
+|---|
+| PES1UG24AM240 |
+| PES1UG24AM251 |
+| PES1UG24AM252 |
+| PES1UG24AM293 |
 
 ## Versioning
 
