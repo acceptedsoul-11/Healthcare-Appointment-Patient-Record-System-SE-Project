@@ -17,10 +17,6 @@ jobs:
     name: Lint, Test and Build
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: healthcare-app
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
