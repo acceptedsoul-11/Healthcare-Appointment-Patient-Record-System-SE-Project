@@ -8,11 +8,11 @@ A software system for managing healthcare appointments and maintaining patient m
 ## Contributors
 
 | PES ID |
-|---|
-| PES1UG24AM240 |
-| PES1UG24AM251 |
-| PES1UG24AM252 |
-| PES1UG24AM293 |
+|---|Role|
+| PES1UG24AM240 |Developer and Team lead|
+| PES1UG24AM251 |Product Owner|
+| PES1UG24AM252 |Test Engineer|
+| PES1UG24AM293 |QA Lead|
 
 ## Versioning
 
