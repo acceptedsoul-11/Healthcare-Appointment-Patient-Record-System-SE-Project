@@ -1,5 +1,6 @@
 # Healthcare Appointment & Patient Record System
-##Sprint Details
+
+## Sprint Details
 <img width="1774" height="887" alt="image" src="https://github.com/user-attachments/assets/a5ce3f2a-cbbe-412d-a10c-6983ddb0a306" />
 
 A software system for managing healthcare appointments and maintaining patient medical records through a secure, role-based application.
