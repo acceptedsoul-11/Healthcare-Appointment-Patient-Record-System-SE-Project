@@ -1,5 +1,7 @@
 # Healthcare Appointment & Patient Record System
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-C62828.svg)](LICENSE)
+
 ## Sprint Details
 <img width="1774" height="887" alt="image" src="https://github.com/user-attachments/assets/83ce3d13-8bc1-4e3e-bacf-bc33557ad747" />
 
