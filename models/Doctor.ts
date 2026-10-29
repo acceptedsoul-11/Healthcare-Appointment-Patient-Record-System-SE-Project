@@ -9,6 +9,10 @@ export interface IDoctor {
   experienceYears: number;
   phone?: string;
   bio?: string;
+  profileImageUrl?: string;
+  profileImagePublicId?: string;
+  licenseNumber?: string;
+  credentialDetails?: string;
   availability: {
     dayOfWeek: number;
     startTime: string;
@@ -64,6 +68,26 @@ const DoctorSchema = new Schema<IDoctor>(
       type: String,
       trim: true,
       maxlength: 1000,
+    },
+    profileImageUrl: {
+      type: String,
+      trim: true,
+      maxlength: 2000,
+    },
+    profileImagePublicId: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+    licenseNumber: {
+      type: String,
+      trim: true,
+      maxlength: 100,
+    },
+    credentialDetails: {
+      type: String,
+      trim: true,
+      maxlength: 2000,
     },
     availability: [
       {
