@@ -1,22 +1,6 @@
 
 import mongoose, { type Mongoose } from "mongoose";
 
-function getMongoURI(): string {
-  const uri = process.env.MONGODB_URI;
-
-  if (!uri) {
-    throw new Error("Please define MONGODB_URI in .env.local");
-  }
-
-  return uri;
-}
-
-const MONGODB_URI = getMongoURI();
-
-if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in .env.local");
-}
-
 type MongooseCache = {
   conn: Mongoose | null;
   promise: Promise<Mongoose> | null;
@@ -37,8 +21,14 @@ export async function connectDB(): Promise<Mongoose> {
     return cached.conn;
   }
 
+  const uri = process.env.MONGODB_URI;
+
+  if (!uri) {
+    throw new Error("Please define MONGODB_URI in your environment");
+  }
+
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI);
+    cached.promise = mongoose.connect(uri);
   }
 
   try {
