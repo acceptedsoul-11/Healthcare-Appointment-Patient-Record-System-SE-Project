@@ -26,7 +26,7 @@ export async function getCurrentUser() {
   const user = await User.findOne({
     _id: session.userId,
     isActive: true,
-  }).select("_id fullName email role");
+  }).select("_id fullName email role accountStatus");
 
   if (!user) {
     return null;
@@ -37,5 +37,6 @@ export async function getCurrentUser() {
     fullName: user.fullName,
     email: user.email,
     role: user.role,
+    accountStatus: user.accountStatus || "approved",
   };
 }
