@@ -1,6 +1,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { requireRole } from "@/lib/require-role";
 
 export const metadata: Metadata = {
@@ -38,7 +39,7 @@ const workspaces = [
   },
 ];
 
-export default async function ReceptionistDashboard() {
+async function ReceptionistContent() {
   const user = await requireRole(["receptionist"]);
 
   return (
@@ -124,5 +125,23 @@ export default async function ReceptionistDashboard() {
         </footer>
       </div>
     </main>
+  );
+}
+
+export default function ReceptionistDashboard() {
+  return (
+    <Suspense
+      fallback={
+        <main className="cw-page min-h-screen p-8">
+          <div className="mx-auto max-w-7xl animate-pulse space-y-5">
+            <div className="h-10 w-64 rounded-lg bg-blue-100" />
+            <div className="h-48 rounded-3xl bg-white" />
+            <div className="h-64 rounded-2xl bg-white" />
+          </div>
+        </main>
+      }
+    >
+      <ReceptionistContent />
+    </Suspense>
   );
 }

@@ -2,7 +2,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import CureWellLogo from "@/components/CureWellLogo";
 
@@ -18,6 +18,9 @@ type RegistrationErrors = {
 export default function RegisterPage() {
   const router = useRouter();
 
+  const [today, setToday] = useState("");
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,6 +33,17 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<RegistrationErrors>({});
+
+  useEffect(() => {
+    const now = new Date();
+
+    const localDate = new Date(
+      now.getTime() - now.getTimezoneOffset() * 60000
+    );
+
+    setToday(localDate.toISOString().slice(0, 10));
+    setCurrentYear(now.getFullYear());
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -342,7 +356,7 @@ export default function RegisterPage() {
                     name="dateOfBirth"
                     type="date"
                     autoComplete="bday"
-                    max={new Date().toISOString().slice(0, 10)}
+                    max={today || undefined}
                     value={dateOfBirth}
                     onChange={(e) => setDateOfBirth(e.target.value)}
                     className={inputClass}
@@ -356,7 +370,10 @@ export default function RegisterPage() {
                   htmlFor="address"
                   className="text-sm font-semibold text-slate-700"
                 >
-                  Address <span className="font-normal text-slate-400">(optional)</span>
+                  Address{" "}
+                  <span className="font-normal text-slate-400">
+                    (optional)
+                  </span>
                 </label>
                 <textarea
                   id="address"
@@ -398,7 +415,7 @@ export default function RegisterPage() {
             </p>
 
             <p className="mt-8 text-center text-xs text-slate-500">
-              © {new Date().getFullYear()} CureWell Multispecialty Hospital
+              © {currentYear ?? ""} CureWell Multispecialty Hospital
             </p>
           </div>
         </section>

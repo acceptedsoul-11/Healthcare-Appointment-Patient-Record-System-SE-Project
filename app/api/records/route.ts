@@ -9,11 +9,10 @@ import Patient from "@/models/Patient";
 import { COOKIE_NAME } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
-  try {
-    // Read the session token from the incoming HTTP request.
-    const token = request.cookies.get(COOKIE_NAME)?.value ?? null;
+  // Keep request-dependent cookie access outside try/catch.
+  const token = request.cookies.get(COOKIE_NAME)?.value ?? null;
 
-    // Authenticate using the explicitly supplied token.
+  try {
     const currentUser = await getCurrentUser(token);
 
     if (!currentUser) {
@@ -49,9 +48,7 @@ export async function GET(request: NextRequest) {
       filter = { doctorId: doctor._id };
     } else {
       return NextResponse.json(
-        {
-          message: "You are not authorized to view medical records.",
-        },
+        { message: "You are not authorized to view medical records." },
         { status: 403 }
       );
     }

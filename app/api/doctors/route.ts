@@ -1,12 +1,18 @@
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+
 import { connectDB } from "@/lib/mongodb";
 import Doctor from "@/models/Doctor";
 import { getCurrentUser } from "@/lib/auth";
+import { COOKIE_NAME } from "@/lib/session";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  // Keep request-dependent access outside the try/catch.
+  // Next.js must be allowed to handle its prerender bailout.
+  const token = request.cookies.get(COOKIE_NAME)?.value ?? null;
+
   try {
-    const currentUser = await getCurrentUser();
+    const currentUser = await getCurrentUser(token);
 
     if (!currentUser) {
       return NextResponse.json(
