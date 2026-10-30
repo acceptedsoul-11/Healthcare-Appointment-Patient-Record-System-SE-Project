@@ -284,7 +284,7 @@ export default function AppointmentsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f8fc] text-slate-800 lg:flex">
+    <main className="cw-page lg:flex">
       <PatientSidebar />
 
       <section className="min-w-0 flex-1">
@@ -307,45 +307,45 @@ export default function AppointmentsPage() {
         </header>
 
         <div className="mx-auto max-w-[1500px] p-4 sm:p-6 lg:p-9">
-          <section className="relative isolate overflow-hidden rounded-[28px] bg-gradient-to-br from-indigo-700 via-indigo-600 to-[#087f8c] p-6 text-white shadow-xl shadow-indigo-900/10 sm:p-9 lg:p-10">
-            <div className="pointer-events-none absolute -right-16 -top-20 -z-10 h-72 w-72 rounded-full border-[44px] border-white/[0.08]" />
-            <div className="pointer-events-none absolute bottom-[-100px] right-[22%] -z-10 h-56 w-56 rounded-full bg-teal-300/10 blur-3xl" />
+          <section className="cw-hero relative isolate overflow-hidden rounded-[28px] p-6 sm:p-9 lg:p-10">
+            <div className="pointer-events-none absolute -right-16 -top-20 -z-10 h-72 w-72 rounded-full border-[44px] border-blue-200/60" />
+            <div className="pointer-events-none absolute bottom-[-100px] right-[22%] -z-10 h-56 w-56 rounded-full bg-blue-100/70 blur-3xl" />
 
             <div className="relative max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-white/90">
-                <span className="h-2 w-2 rounded-full bg-teal-300" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.15em] text-blue-800">
+                <span className="h-2 w-2 rounded-full bg-blue-600" />
                 Care for a Healthier Tomorrow
               </span>
 
-              <h2 className="mt-5 text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-[42px]">
+              <h2 className="mt-5 text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl lg:text-[42px]">
                 Find your doctor.
               </h2>
 
-              <p className="mt-4 max-w-xl text-sm leading-7 text-white/80 sm:text-base">
+              <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
                 Explore our medical team, review consultation fees and request
                 an appointment using the doctor&apos;s recorded availability.
               </p>
 
               <a
                 href="#doctor-directory"
-                className="mt-7 inline-flex rounded-xl bg-white px-5 py-3 text-sm font-bold text-indigo-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-indigo-50"
+                className="cw-primary mt-7 inline-flex rounded-xl px-5 py-3 text-sm font-bold transition hover:-translate-y-0.5"
               >
                 Explore our doctors ↓
               </a>
             </div>
 
-            <div className="relative mt-8 grid max-w-xl grid-cols-2 gap-3 border-t border-white/15 pt-5">
+            <div className="relative mt-8 grid max-w-xl grid-cols-2 gap-3 border-t border-blue-200 pt-5">
               <div>
-                <p className="text-2xl font-extrabold">{doctors.length}</p>
-                <p className="mt-1 text-xs text-white/70">
+                <p className="text-2xl font-extrabold text-slate-900">{doctors.length}</p>
+                <p className="mt-1 text-xs text-slate-600">
                   Registered doctors
                 </p>
               </div>
               <div>
-                <p className="text-2xl font-extrabold">
+                <p className="text-2xl font-extrabold text-slate-900">
                   {Math.max(0, specialties.length - 1)}
                 </p>
-                <p className="mt-1 text-xs text-white/70">
+                <p className="mt-1 text-xs text-slate-600">
                   Specialties represented
                 </p>
               </div>

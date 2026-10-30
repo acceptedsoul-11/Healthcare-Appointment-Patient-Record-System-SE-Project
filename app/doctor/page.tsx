@@ -38,30 +38,30 @@ export default async function DoctorDashboard() {
   const user = await requireRole(["doctor"]);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800">
+    <main className="cw-page">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
-          <Link href="/" className="text-xl font-bold tracking-tight text-teal-800">
+          <Link href="/" className="text-xl font-bold tracking-tight text-blue-700">
             CureWell
             <span className="ml-2 text-sm font-normal text-slate-500">
               Doctor Portal
             </span>
           </Link>
-          <span className="rounded-full bg-teal-50 px-3 py-1.5 text-xs font-semibold text-teal-800">
+          <span className="rounded-full bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-800">
             Doctor
           </span>
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
-        <div className="rounded-3xl bg-gradient-to-r from-teal-800 to-cyan-700 p-8 text-white sm:p-10">
-          <p className="text-sm font-medium text-teal-100">
+        <div className="cw-hero rounded-3xl p-8 sm:p-10">
+          <p className="text-sm font-medium text-blue-700">
             DOCTOR WORKSPACE
           </p>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
             Welcome, Dr. {user.fullName}
           </h1>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-teal-50">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
             Manage your clinical workflow, appointment schedule and authorized
             patient care information from one place.
           </p>
@@ -81,7 +81,7 @@ export default async function DoctorDashboard() {
                 key={feature.number}
                 className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
               >
-                <span className="text-xs font-bold tracking-widest text-teal-700">
+                <span className="text-xs font-bold tracking-widest text-blue-700">
                   {feature.number}
                 </span>
                 <h3 className="mt-4 text-lg font-bold text-slate-900">

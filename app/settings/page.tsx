@@ -33,7 +33,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f5f7fc] text-slate-800 md:flex">
+    <div className="cw-page md:flex">
       <aside className="border-b border-slate-200 bg-white p-5 md:min-h-screen md:w-64 md:border-b-0 md:border-r">
         <Link href="/" className="mb-7 flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-2xl font-bold text-white">
@@ -68,10 +68,10 @@ export default function SettingsPage() {
           ))}
         </nav>
 
-        <div className="mt-8 hidden rounded-2xl bg-gradient-to-br from-indigo-600 to-teal-500 p-5 text-white md:block">
-          <div className="mb-3 text-2xl">♡</div>
+        <div className="mt-8 hidden rounded-2xl border border-blue-200 bg-blue-50 p-5 text-slate-900 md:block">
+          <div className="mb-3 text-2xl text-blue-700">♡</div>
           <p className="font-bold">Your health matters.</p>
-          <p className="mt-2 text-sm leading-6 text-indigo-50">
+          <p className="mt-2 text-sm leading-6 text-slate-600">
             Care for a Healthier Tomorrow.
           </p>
         </div>
@@ -93,7 +93,7 @@ export default function SettingsPage() {
 
           <Link
             href="/"
-            className="inline-flex w-fit items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold shadow-sm transition hover:bg-slate-50"
+            className="cw-secondary inline-flex w-fit items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold shadow-sm transition"
           >
             ← Back to Dashboard
           </Link>
@@ -289,7 +289,7 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => setSaved(true)}
-                className="rounded-xl bg-indigo-600 px-6 py-3 font-bold text-white shadow-lg shadow-indigo-200 transition hover:bg-indigo-700"
+                className="cw-primary rounded-xl px-6 py-3 font-bold transition"
               >
                 Save Preferences
               </button>
@@ -306,7 +306,7 @@ export default function SettingsPage() {
                   setLanguage("English");
                   setSaved(false);
                 }}
-                className="rounded-xl border border-slate-200 bg-white px-6 py-3 font-semibold text-slate-600 transition hover:bg-slate-50"
+                className="cw-secondary rounded-xl px-6 py-3 font-semibold transition"
               >
                 Reset to Defaults
               </button>
@@ -314,18 +314,18 @@ export default function SettingsPage() {
           </div>
 
           <aside className="space-y-6">
-            <section className="rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-600 to-teal-500 p-6 text-white shadow-lg">
-              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 text-2xl">
+            <section className="cw-hero rounded-2xl p-6">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-2xl text-blue-700 shadow-sm">
                 ✦
               </div>
-              <h3 className="text-xl font-extrabold">Your experience, your way.</h3>
-              <p className="mt-3 text-sm leading-6 text-indigo-50">
+              <h3 className="text-xl font-extrabold text-slate-900">Your experience, your way.</h3>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 Manage your preferences and make your CureWell experience more
                 comfortable.
               </p>
-              <div className="mt-6 border-t border-white/20 pt-5">
-                <p className="text-sm font-semibold">CureWell Multispecialty Hospital</p>
-                <p className="mt-1 text-xs text-indigo-100">
+              <div className="mt-6 border-t border-blue-200 pt-5">
+                <p className="text-sm font-semibold text-slate-900">CureWell Multispecialty Hospital</p>
+                <p className="mt-1 text-xs text-slate-600">
                   Care for a Healthier Tomorrow
                 </p>
               </div>

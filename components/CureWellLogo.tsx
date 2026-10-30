@@ -20,7 +20,7 @@ export default function CureWellLogo({
     >
       <span
         aria-hidden="true"
-        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#187b91] text-xl font-bold text-white shadow-sm"
+        className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-xl font-bold text-white shadow-sm"
       >
         +
       </span>
@@ -32,7 +32,7 @@ export default function CureWellLogo({
               light ? "text-white" : "text-slate-900"
             }`}
           >
-            CureWell<span className="text-teal-500">.</span>
+            CureWell<span className="text-blue-600">.</span>
           </span>
 
           <span

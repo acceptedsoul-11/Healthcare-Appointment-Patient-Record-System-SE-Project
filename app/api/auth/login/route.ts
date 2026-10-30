@@ -49,6 +49,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (user.role === "doctor" && user.accountStatus !== "approved") {
+      const message =
+        user.accountStatus === "rejected"
+          ? "Your doctor application was not approved. Please contact the hospital administrator."
+          : "Your doctor application is awaiting administrator approval.";
+
+      return NextResponse.json({ success: false, message }, { status: 403 });
+    }
+
     const token = await createSessionToken({
       id: user._id.toString(),
       role: user.role,

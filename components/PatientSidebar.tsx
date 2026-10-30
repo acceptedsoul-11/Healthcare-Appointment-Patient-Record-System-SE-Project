@@ -43,7 +43,7 @@ export default function PatientSidebar({
         aria-expanded={mobileOpen}
         aria-controls="patient-sidebar"
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-xl border border-[#c9e1e5] bg-white text-xl text-[#187b91] shadow-sm transition hover:bg-[#ddf1f3] focus:outline-none focus:ring-4 focus:ring-[#c9e1e5] lg:hidden"
+        className="fixed left-4 top-4 z-30 flex h-11 w-11 items-center justify-center rounded-xl border border-blue-200 bg-white text-xl text-blue-700 shadow-sm transition hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-100 lg:hidden"
       >
         ☰
       </button>
@@ -102,8 +102,8 @@ export default function PatientSidebar({
                   aria-current={active ? "page" : undefined}
                   className={`group flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm font-semibold transition duration-200 focus:outline-none focus:ring-4 focus:ring-indigo-100 ${
                     active
-                      ? "bg-[#187b91] text-white shadow-sm"
-                      : "text-slate-600 hover:bg-[#ddf1f3] hover:text-[#17324d]"
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-slate-700 hover:bg-blue-50 hover:text-blue-800"
                   }`}
                 >
                   <span
@@ -111,7 +111,7 @@ export default function PatientSidebar({
                     className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg transition ${
                       active
                         ? "bg-white/15 text-white"
-                        : "bg-slate-50 text-slate-500 group-hover:bg-white group-hover:text-[#187b91]"
+                        : "bg-slate-50 text-slate-600 group-hover:bg-white group-hover:text-blue-700"
                     }`}
                   >
                     {item.icon}
@@ -133,7 +133,7 @@ export default function PatientSidebar({
 
         {/* Appointment call to action */}
         <div className="mt-auto p-4">
-          <div className="relative overflow-hidden rounded-2xl border border-[#c9e1e5] bg-[#e9f3f7] p-4 text-[#17324d] shadow-sm">
+          <div className="relative overflow-hidden rounded-2xl border border-blue-200 bg-blue-50 p-4 text-slate-900 shadow-sm">
             <div
               aria-hidden="true"
               className="pointer-events-none absolute -right-7 -top-7 h-24 w-24 rounded-full border-[16px] border-white/10"
@@ -142,7 +142,7 @@ export default function PatientSidebar({
             <div className="relative">
               <span
                 aria-hidden="true"
-                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl text-[#187b91]"
+                    className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl text-blue-700"
               >
                 ✚
               </span>
@@ -151,7 +151,7 @@ export default function PatientSidebar({
                 Your health comes first.
               </p>
 
-              <p className="mt-2 text-xs leading-5 text-[#60758a]">
+              <p className="mt-2 text-xs leading-5 text-slate-600">
                 Take the next step toward better health with our medical team.
               </p>
 
@@ -162,7 +162,7 @@ export default function PatientSidebar({
                     closeMobileMenu();
                     onBookAppointment();
                   }}
-                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#187b91] px-3.5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#126b7e] focus:outline-none focus:ring-4 focus:ring-[#c9e1e5]"
+                  className="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3.5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100"
                 >
                   Book an appointment
                   <span aria-hidden="true">→</span>

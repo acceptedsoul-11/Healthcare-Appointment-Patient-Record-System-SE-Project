@@ -1,21 +1,20 @@
-
 @import "tailwindcss";
 
 :root {
-  --background: #f1f6fa;
-  --foreground: #17324d;
-
-  --brand-indigo: #285c78;
-  --brand-violet: #4e7f98;
-  --brand-teal: #187b91;
-  --brand-coral: #d9a592;
-  --brand-light: #ddf1f3;
-
-  --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --muted: #60758a;
-  --border: #dce6ee;
-  --focus-ring: rgb(24 123 145 / 18%);
+  --background: #f6faff;
+  --foreground: #111827;
+  --cw-surface: #ffffff;
+  --cw-surface-muted: #f8fbff;
+  --cw-primary: #2563eb;
+  --cw-primary-hover: #1d4ed8;
+  --cw-primary-active: #1e40af;
+  --cw-primary-soft: #eff6ff;
+  --cw-primary-border: #bfdbfe;
+  --cw-border: #dbe7f3;
+  --cw-text: #111827;
+  --cw-muted: #475569;
+  --cw-subtle: #64748b;
+  --cw-focus: rgb(37 99 235 / 22%);
 }
 
 @theme inline {
@@ -25,9 +24,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html {
   min-height: 100%;
@@ -40,339 +37,81 @@ body {
   min-height: 100vh;
   margin: 0;
   background: var(--background);
-  color: var(--foreground);
+  color: var(--cw-text);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
-button,
-input,
-select,
-textarea {
-  font: inherit;
+button, input, select, textarea { font: inherit; }
+button, [role="button"] { cursor: pointer; font-weight: 600; }
+button:disabled, [role="button"][aria-disabled="true"] { cursor: not-allowed; opacity: 0.6; }
+a { color: inherit; text-decoration: none; -webkit-tap-highlight-color: transparent; }
+img, svg, video { display: block; max-width: 100%; }
+input, select, textarea { max-width: 100%; }
+
+input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
 }
 
-button,
-[role="button"] {
-  cursor: pointer;
-  font-weight: 600;
-}
-
-button:disabled,
-[role="button"][aria-disabled="true"] {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-}
-
-button {
-  -webkit-tap-highlight-color: transparent;
-}
-
-img,
-svg,
-video {
-  display: block;
-  max-width: 100%;
-}
-
-input,
-select,
-textarea {
-  max-width: 100%;
-}
-
-input:not([type="checkbox"]):not([type="radio"]),
-select,
-textarea {
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    background-color 180ms ease;
-}
-
-input:not([type="checkbox"]):not([type="radio"]):focus,
-select:focus,
-textarea:focus {
+input:not([type="checkbox"]):not([type="radio"]):focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #187b91;
-  box-shadow: 0 0 0 4px var(--focus-ring);
+  border-color: var(--cw-primary) !important;
+  box-shadow: 0 0 0 4px var(--cw-focus) !important;
 }
 
-button:focus-visible,
-a:focus-visible,
-[role="button"]:focus-visible,
-select:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 3px solid #6ab8c5;
+button:focus-visible, a:focus-visible, [role="button"]:focus-visible, select:focus-visible, input:focus-visible, textarea:focus-visible {
+  outline: 3px solid #93c5fd;
   outline-offset: 3px;
 }
 
-::selection {
-  background: #d7eef2;
-  color: #17324d;
+::selection { background: #dbeafe; color: var(--cw-text); }
+
+/* Reusable blue-and-white healthcare primitives. */
+.cw-page { min-height: 100vh; background: var(--background); color: var(--cw-text); }
+.cw-card { border: 1px solid var(--cw-border); background: var(--cw-surface); box-shadow: 0 8px 22px rgb(15 23 42 / 6%); }
+.cw-hero { border: 1px solid var(--cw-primary-border); background: var(--cw-primary-soft); color: var(--cw-text); box-shadow: 0 8px 22px rgb(37 99 235 / 7%); }
+.cw-hero .cw-eyebrow { color: #1d4ed8; }
+.cw-hero .cw-hero-copy { color: var(--cw-muted); }
+
+.cw-primary, .cw-auth-primary {
+  border: 1px solid var(--cw-primary) !important;
+  background: var(--cw-primary) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 12px rgb(37 99 235 / 18%);
 }
+.cw-primary:hover:not(:disabled), .cw-auth-primary:hover:not(:disabled) { background: var(--cw-primary-hover) !important; color: #fff !important; }
+.cw-primary:active:not(:disabled), .cw-auth-primary:active:not(:disabled) { background: var(--cw-primary-active) !important; }
+.cw-primary:disabled, .cw-auth-primary:disabled { border-color: #94a3b8 !important; background: #94a3b8 !important; color: #fff !important; box-shadow: none; opacity: 1; }
+.cw-secondary, .cw-auth-secondary { border: 1px solid var(--cw-primary-border) !important; background: #fff !important; color: #1e3a8a !important; }
+.cw-secondary:hover:not(:disabled), .cw-auth-secondary:hover:not(:disabled) { background: var(--cw-primary-soft) !important; border-color: #93c5fd !important; }
+.cw-danger { border: 1px solid #dc2626 !important; background: #dc2626 !important; color: #fff !important; }
+.cw-danger:hover:not(:disabled) { background: #b91c1c !important; }
 
-/* Shared light, premium auth shell for login and registration flows. */
-.cw-auth-page {
-  min-height: 100vh;
-  background: #f1f6fa;
-  color: #17324d;
-}
+/* Login, patient registration and doctor-application shell. */
+.cw-auth-page { min-height: 100vh; background: #f6faff; color: var(--cw-text); }
+.cw-auth-brand { background: #eaf3ff; color: var(--cw-text); border-right: 1px solid var(--cw-primary-border); }
+.cw-auth-content { background: transparent; }
+.cw-auth-card { border: 1px solid var(--cw-border); border-radius: 1.5rem; background: #fff; box-shadow: 0 12px 28px rgb(15 23 42 / 8%); padding: clamp(1.5rem, 4vw, 2.5rem); }
+.cw-auth-card h1, .cw-auth-card h2, .cw-auth-card h3, .cw-auth-card label, .cw-auth-card .cw-auth-heading { color: var(--cw-text) !important; }
+.cw-auth-card p, .cw-auth-card .cw-auth-muted { color: var(--cw-muted) !important; }
+.cw-auth-card input, .cw-auth-card select, .cw-auth-card textarea { border-color: var(--cw-border) !important; background: #fff !important; color: var(--cw-text) !important; }
+.cw-auth-card input::placeholder, .cw-auth-card textarea::placeholder { color: #64748b !important; }
 
-.cw-auth-brand {
-  background: #e9f3f7 !important;
-  color: #17324d !important;
-}
+.card-hover:hover { border-color: var(--cw-primary-border); box-shadow: 0 12px 24px rgb(37 99 235 / 10%); }
 
-.cw-auth-content {
-  background: transparent;
-}
+* { scrollbar-width: thin; scrollbar-color: #bfdbfe transparent; }
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #bfdbfe; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #93c5fd; }
+::-webkit-scrollbar-track { background: transparent; }
 
-.cw-auth-card {
-  border: 1px solid #dce6ee;
-  border-radius: 1.5rem;
-  background: #ffffff;
-  box-shadow: 0 10px 28px rgb(23 50 77 / 8%);
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-}
-
-.cw-auth-card h1,
-.cw-auth-card h2,
-.cw-auth-card h3,
-.cw-auth-card label,
-.cw-auth-card .cw-auth-heading {
-  color: #17324d !important;
-}
-
-.cw-auth-card p,
-.cw-auth-card .cw-auth-muted {
-  color: #60758a !important;
-}
-
-.cw-auth-card input,
-.cw-auth-card select,
-.cw-auth-card textarea {
-  border-color: #dce6ee !important;
-  background: #ffffff !important;
-  color: #17324d !important;
-}
-
-.cw-auth-card input::placeholder,
-.cw-auth-card textarea::placeholder {
-  color: #64748b !important;
-}
-
-.cw-auth-card input:focus,
-.cw-auth-card select:focus,
-.cw-auth-card textarea:focus {
-  border-color: #187b91 !important;
-  box-shadow: 0 0 0 4px rgb(24 123 145 / 16%) !important;
-}
-
-.cw-auth-primary {
-  border: 1px solid #187b91 !important;
-  background: #187b91 !important;
-  color: #ffffff !important;
-  box-shadow: 0 6px 16px rgb(24 123 145 / 18%) !important;
-}
-
-.cw-auth-primary:hover:not(:disabled) {
-  background: #126b7e !important;
-  color: #ffffff !important;
-  box-shadow: 0 8px 18px rgb(24 123 145 / 23%) !important;
-}
-
-.cw-auth-primary:active:not(:disabled) {
-  background: #0f5c6d !important;
-}
-
-.cw-auth-primary:disabled {
-  border-color: #aebfc9 !important;
-  background: #aebfc9 !important;
-  color: #ffffff !important;
-  box-shadow: none !important;
-  opacity: 1;
-}
-
-.cw-auth-secondary {
-  border-color: #bcdde1 !important;
-  background: #ddf1f3 !important;
-  color: #17324d !important;
-}
-
-.cw-auth-secondary:hover {
-  border-color: #7bb9c2 !important;
-  background: #c9e8eb !important;
-  color: #17324d !important;
-}
-
-.cw-auth-card .text-white { color: #17324d !important; }
-.cw-auth-card .text-teal-100,
-.cw-auth-card .text-teal-100\/80,
-.cw-auth-card .text-teal-100\/75,
-.cw-auth-card .text-teal-100\/65 { color: #60758a !important; }
-.cw-auth-card .text-teal-200 { color: #187b91 !important; }
-.cw-auth-brand .text-white,
-.cw-auth-brand h1 { color: #17324d !important; }
-.cw-auth-brand .text-teal-50,
-.cw-auth-brand .text-teal-100,
-.cw-auth-brand .text-teal-100\/80,
-.cw-auth-brand .text-teal-200,
-.cw-auth-brand .text-white\/95 { color: #60758a !important; }
-.cw-auth-brand .bg-white\/10 { background: rgb(255 255 255 / 64%) !important; }
-
-/* Apply the same restrained healthcare palette to existing dashboards and
-   portal pages without changing their component structure. */
-main[class*="bg-slate-50"],
-main[class*="bg-\[#f5f8fc\]"] {
-  background: #f1f6fa !important;
-}
-
-[class*="bg-gradient-to"] {
-  background-image: none !important;
-  background-color: #e9f3f7 !important;
-}
-
-[class*="bg-gradient-to"][class*="text-white"],
-[class*="bg-gradient-to"] .text-white,
-[class*="bg-gradient-to"] .text-white\/95,
-[class*="bg-gradient-to"] .text-white\/90,
-[class*="bg-gradient-to"] .text-white\/85,
-[class*="bg-gradient-to"] .text-white\/80,
-[class*="bg-gradient-to"] .text-teal-50,
-[class*="bg-gradient-to"] .text-teal-100,
-[class*="bg-gradient-to"] .text-teal-100\/80,
-[class*="bg-gradient-to"] .text-teal-200 {
-  color: #17324d !important;
-}
-
-[class*="bg-gradient-to"] [class*="border-white"] {
-  border-color: #dce6ee !important;
-}
-
-[class*="bg-indigo-50"],
-[class*="bg-violet-50"],
-[class*="bg-fuchsia-50"] {
-  background-color: #edf6f7 !important;
-}
-
-[class*="text-indigo-"],
-[class*="text-violet-"],
-[class*="text-fuchsia-"] {
-  color: #187b91 !important;
-}
-
-[class*="border-indigo-"],
-[class*="border-violet-"] {
-  border-color: #c9e1e5 !important;
-}
-
-[class*="hover:bg-indigo-50"]:hover,
-[class*="hover:bg-violet-50"]:hover {
-  background-color: #ddf1f3 !important;
-}
-
-/* High-contrast action treatment shared across the existing pages. These
-   selectors deliberately enhance the current Tailwind actions without
-   changing their route, behavior, or disabled states. */
-button[class*="bg-indigo-600"],
-a[class*="bg-indigo-600"] {
-  background-image: none !important;
-  background-color: #187b91 !important;
-  box-shadow: 0 6px 16px rgb(24 123 145 / 18%);
-}
-
-button[class*="bg-indigo-600"]:hover:not(:disabled),
-a[class*="bg-indigo-600"]:hover {
-  background-image: none !important;
-  background-color: #126b7e !important;
-  box-shadow: 0 8px 18px rgb(24 123 145 / 23%);
-}
-
-button[class*="bg-teal-600"],
-a[class*="bg-teal-600"] {
-  background-image: none !important;
-  background-color: #187b91 !important;
-  box-shadow: 0 6px 16px rgb(24 123 145 / 18%);
-}
-
-button[class*="bg-white"][class*="border"],
-a[class*="bg-white"][class*="border"] {
-  border-color: #dce6ee;
-}
-
-button[class*="border-slate-200"],
-a[class*="border-slate-200"] {
-  border-color: #dce6ee;
-}
-
-button[class*="disabled:bg-slate-300"]:disabled {
-  background: #cbd5e1 !important;
-  color: #475569 !important;
-  opacity: 1;
-}
-
-.card-hover:hover {
-  border-color: #bcdde1;
-  box-shadow: 0 12px 24px rgb(23 50 77 / 8%);
-}
-
-/* Consistent scrollbar */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
-}
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Optional reusable card hover effect */
 @media (prefers-reduced-motion: no-preference) {
-  .card-hover {
-    transition:
-      transform 180ms ease,
-      box-shadow 180ms ease,
-      border-color 180ms ease;
-  }
-
-  .card-hover:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 12px 24px rgb(23 50 77 / 8%);
-  }
+  .card-hover { transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease; }
+  .card-hover:hover { transform: translateY(-3px); }
 }
 
-/* Respect accessibility preferences */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

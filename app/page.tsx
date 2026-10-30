@@ -506,14 +506,14 @@ export default function Home() {
             </div>
           )}
 
-          <section className="relative isolate overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-br from-white via-indigo-50/60 to-teal-50 p-6 shadow-sm sm:p-9 lg:p-10">
+          <section className="cw-hero relative isolate overflow-hidden rounded-3xl p-6 sm:p-9 lg:p-10">
             <div
               aria-hidden="true"
-              className="pointer-events-none absolute -right-16 -top-24 -z-10 h-72 w-72 rounded-full border-[42px] border-indigo-600/[0.05]"
+              className="pointer-events-none absolute -right-16 -top-24 -z-10 h-72 w-72 rounded-full border-[42px] border-blue-600/[0.05]"
             />
             <div className="relative max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/80 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-indigo-800">
-                <span className="h-1.5 w-1.5 rounded-full bg-teal-600" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-blue-800">
+                <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
                 Your healthcare, in one place
               </span>
 
@@ -532,13 +532,13 @@ export default function Home() {
               <div className="mt-7 flex flex-wrap gap-3">
                 <Link
                   href="/find-doctors"
-                  className="rounded-xl bg-indigo-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-indigo-700"
+                  className="cw-primary rounded-xl px-5 py-3 text-sm font-bold transition"
                 >
                   Find a doctor →
                 </Link>
                 <Link
                   href={signedIn ? "/appointments" : "/login"}
-                  className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 hover:bg-teal-50"
+                  className="cw-secondary rounded-xl px-5 py-3 text-sm font-semibold"
                 >
                   {signedIn ? "View appointments" : "Sign in to your account"}
                 </Link>
@@ -744,9 +744,9 @@ export default function Home() {
                 </div>
               </Card>
 
-              <Card className="bg-gradient-to-br from-white to-teal-50/60 p-5 sm:p-6">
+              <Card className="border-blue-100 bg-blue-50/60 p-5 sm:p-6">
                 <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-lg text-teal-700 shadow-sm">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-lg text-blue-700 shadow-sm">
                     ♡
                   </span>
                   <h2 className="text-base font-bold text-slate-900">

@@ -42,12 +42,12 @@ export default async function ReceptionistDashboard() {
   const user = await requireRole(["receptionist"]);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800">
+    <main className="cw-page">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-5 sm:px-8">
           <Link
             href="/"
-            className="text-xl font-bold tracking-tight text-teal-800"
+            className="text-xl font-bold tracking-tight text-blue-700"
           >
             CureWell
             <span className="ml-2 text-sm font-normal text-slate-500">
@@ -62,16 +62,16 @@ export default async function ReceptionistDashboard() {
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8">
-        <section className="rounded-3xl bg-gradient-to-r from-indigo-800 to-violet-700 p-8 text-white sm:p-10">
-          <p className="text-sm font-medium text-indigo-100">
+        <section className="cw-hero rounded-3xl p-8 sm:p-10">
+          <p className="text-sm font-medium text-blue-700">
             FRONT DESK WORKSPACE
           </p>
 
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
+          <h1 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">
             Welcome, {user.fullName}
           </h1>
 
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-indigo-50">
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
             Coordinate patient visits, support registration and help the
             hospital run smoothly from one organized workspace.
           </p>
@@ -92,7 +92,7 @@ export default async function ReceptionistDashboard() {
                 key={item.number}
                 className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
-                <span className="text-xs font-bold tracking-widest text-indigo-700">
+                <span className="text-xs font-bold tracking-widest text-blue-700">
                   {item.number}
                 </span>
 

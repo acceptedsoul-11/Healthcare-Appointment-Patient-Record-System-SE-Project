@@ -4,6 +4,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
+import CureWellLogo from "@/components/CureWellLogo";
 
 type RegistrationErrors = {
   fullName?: string[];
@@ -107,37 +108,27 @@ export default function RegisterPage() {
     <main className="cw-auth-page">
       <div className="grid min-h-screen lg:grid-cols-2">
         {/* Left brand panel */}
-        <section className="cw-auth-brand relative hidden overflow-hidden p-12 text-white lg:flex lg:flex-col lg:justify-between xl:p-16">
-          <div className="absolute -right-24 top-24 h-80 w-80 rounded-full border border-white/10" />
-          <div className="absolute -right-12 top-36 h-56 w-56 rounded-full border border-white/10" />
-          <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-white/5" />
+        <section className="cw-auth-brand relative hidden overflow-hidden p-12 lg:flex lg:flex-col lg:justify-between xl:p-16">
+          <div className="absolute -right-24 top-24 h-80 w-80 rounded-full border border-blue-200/70" />
+          <div className="absolute -right-12 top-36 h-56 w-56 rounded-full border border-blue-200/70" />
+          <div className="absolute -bottom-32 -left-20 h-96 w-96 rounded-full bg-blue-100/60" />
 
-          <Link href="/" className="relative flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-xl font-bold text-teal-800 shadow-lg">
-              C+
-            </div>
-            <div>
-              <p className="text-xl font-bold tracking-tight">CureWell</p>
-              <p className="text-xs text-teal-100">
-                Multispecialty Hospital
-              </p>
-            </div>
-          </Link>
+          <CureWellLogo className="relative" />
 
           <div className="relative max-w-lg py-12">
-            <span className="inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-medium tracking-wide text-teal-50">
+            <span className="inline-flex rounded-full border border-blue-200 bg-white px-4 py-2 text-xs font-semibold tracking-wide text-blue-700">
               YOUR HEALTH, OUR PRIORITY
             </span>
 
-            <h1 className="mt-8 text-5xl font-semibold leading-tight tracking-tight xl:text-6xl">
+            <h1 className="mt-8 text-5xl font-semibold leading-tight tracking-tight text-slate-900 xl:text-6xl">
               A healthier
               <br />
               tomorrow starts
               <br />
-              <span className="text-teal-200">with you.</span>
+              <span className="text-blue-600">with you.</span>
             </h1>
 
-            <p className="mt-6 max-w-md text-base leading-7 text-teal-50/90">
+            <p className="mt-6 max-w-md text-base leading-7 text-slate-600">
               Create your patient account to discover trusted doctors,
               manage appointments and keep your healthcare journey organized.
             </p>
@@ -149,16 +140,16 @@ export default function RegisterPage() {
                 "Access your healthcare information securely",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/15 text-sm">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm text-white">
                     ✓
                   </span>
-                  <span className="text-sm text-white/95">{item}</span>
+                  <span className="text-sm text-slate-700">{item}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <p className="relative text-xs text-teal-100/80">
+          <p className="relative text-xs text-slate-500">
             Care for a Healthier Tomorrow
           </p>
         </section>
@@ -168,34 +159,24 @@ export default function RegisterPage() {
           <div className="cw-auth-card w-full max-w-xl">
             <Link
               href="/"
-              className="mb-8 inline-flex items-center gap-2 text-sm text-teal-100 transition hover:text-teal-300 lg:hidden"
+              className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-blue-700 transition hover:text-blue-900 lg:hidden"
             >
               <span className="text-lg">←</span>
               Back to home
             </Link>
 
             <div className="mb-8">
-              <div className="mb-5 flex items-center gap-3 lg:hidden">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-teal-700 font-bold text-white">
-                  C+
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-white">CureWell</p>
-                  <p className="text-xs text-teal-100">
-                    Multispecialty Hospital
-                  </p>
-                </div>
-              </div>
+              <CureWellLogo className="mb-5 lg:hidden" />
 
-              <p className="text-sm font-semibold uppercase tracking-widest text-teal-300">
+              <p className="text-sm font-semibold uppercase tracking-widest text-blue-700">
                 Patient registration
               </p>
 
-              <h2 className="mt-2 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
                 Create your account
               </h2>
 
-              <p className="mt-3 text-sm leading-6 text-teal-100/80">
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 Join CureWell to manage your healthcare journey with ease.
               </p>
             </div>
@@ -391,7 +372,7 @@ export default function RegisterPage() {
                 {fieldError("address")}
               </div>
 
-              <p className="text-xs leading-5 text-teal-100/75">
+              <p className="text-xs leading-5 text-slate-500">
                 By creating an account, you agree to use CureWell responsibly
                 and provide accurate registration information.
               </p>
@@ -406,17 +387,17 @@ export default function RegisterPage() {
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm text-teal-100/80">
+            <p className="mt-6 text-center text-sm text-slate-600">
               Already have an account?{" "}
               <Link
                 href="/login"
-                className="font-semibold text-teal-200 hover:text-teal-50"
+                className="font-semibold text-blue-700 hover:text-blue-900"
               >
                 Sign in
               </Link>
             </p>
 
-            <p className="mt-8 text-center text-xs text-teal-100/65">
+            <p className="mt-8 text-center text-xs text-slate-500">
               © {new Date().getFullYear()} CureWell Multispecialty Hospital
             </p>
           </div>

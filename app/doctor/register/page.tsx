@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useMemo, useState } from "react";
+import CureWellLogo from "@/components/CureWellLogo";
 
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -53,14 +54,15 @@ export default function DoctorRegistrationPage() {
   return (
     <main className="cw-auth-page px-5 py-10 sm:px-8">
       <div className="mx-auto max-w-3xl">
-        <Link href="/login" className="text-sm font-semibold text-teal-200 hover:text-teal-50">← Back to sign in</Link>
-        <header className="cw-auth-brand mt-8 rounded-3xl border border-teal-100/10 p-7 text-white shadow-xl shadow-slate-950/30 sm:p-10">
-          <p className="text-xs font-bold uppercase tracking-[.18em] text-teal-200">CureWell Multispecialty Hospital</p>
-          <h1 className="mt-3 text-3xl font-extrabold">Doctor application</h1>
-          <p className="mt-3 text-sm leading-6 text-teal-50/80">Submit your professional details for administrator review. You will receive access only after approval.</p>
+        <Link href="/login" className="text-sm font-semibold text-blue-700 hover:text-blue-900">← Back to sign in</Link>
+        <header className="cw-hero mt-8 rounded-3xl p-7 sm:p-10">
+          <CureWellLogo />
+          <p className="cw-eyebrow mt-7 text-xs font-bold uppercase tracking-[.18em]">CureWell Multispecialty Hospital</p>
+          <h1 className="mt-3 text-3xl font-extrabold text-slate-900">Doctor application</h1>
+          <p className="cw-hero-copy mt-3 text-sm leading-6">Submit your professional details for administrator review. You will receive access only after approval.</p>
         </header>
 
-        {message && <p role="status" className="mt-6 rounded-xl border border-cyan-200/20 bg-cyan-100/10 p-4 text-sm text-cyan-50">{message}</p>}
+        {message && <p role="status" className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{message}</p>}
 
         <form onSubmit={submit} className="cw-auth-card mt-6 space-y-6">
           <section>
@@ -74,31 +76,31 @@ export default function DoctorRegistrationPage() {
             </div>
           </section>
 
-          <section className="border-t border-teal-100/15 pt-6">
+          <section className="border-t border-slate-200 pt-6">
             <h2 className="text-lg font-extrabold">Professional information</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">Specialization<input required name="specialization" className={input} /></label>
-              <label className="text-sm font-semibold">Qualifications <span className="font-normal text-teal-100/65">(comma-separated)</span><input required name="qualifications" className={input} /></label>
+              <label className="text-sm font-semibold">Qualifications <span className="font-normal text-slate-500">(comma-separated)</span><input required name="qualifications" className={input} /></label>
               <label className="text-sm font-semibold">Years of experience<input required name="experienceYears" type="number" min="0" max="70" className={input} /></label>
               <label className="text-sm font-semibold">Consultation fee (₹)<input required name="consultationFee" type="number" min="0" className={input} /></label>
               <label className="text-sm font-semibold sm:col-span-2">Medical registration / license number<input required name="licenseNumber" className={input} /></label>
               <label className="text-sm font-semibold sm:col-span-2">Professional biography<textarea name="bio" maxLength={1000} rows={4} className={input} /></label>
-              <label className="text-sm font-semibold sm:col-span-2">Credentials for review <span className="font-normal text-teal-100/65">(optional)</span><textarea name="credentialDetails" maxLength={2000} rows={3} className={input} /></label>
+              <label className="text-sm font-semibold sm:col-span-2">Credentials for review <span className="font-normal text-slate-500">(optional)</span><textarea name="credentialDetails" maxLength={2000} rows={3} className={input} /></label>
             </div>
           </section>
 
-          <section className="border-t border-teal-100/15 pt-6">
+          <section className="border-t border-slate-200 pt-6">
             <h2 className="text-lg font-extrabold">Availability</h2>
-            <p className="mt-1 text-sm text-teal-100/75">Selected days use 09:00–17:00 initially; an administrator can review the schedule before approval.</p>
+            <p className="mt-1 text-sm text-slate-600">Selected days use 09:00–17:00 initially; an administrator can review the schedule before approval.</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {days.map((day, index) => <button key={day} type="button" aria-pressed={selectedDays.includes(index)} onClick={() => setSelectedDays((current) => current.includes(index) ? current.filter((item) => item !== index) : [...current, index])} className={`rounded-lg px-3 py-2 text-sm font-semibold transition ${selectedDays.includes(index) ? "cw-auth-primary" : "cw-auth-secondary"}`}>{day}</button>)}
             </div>
           </section>
 
-          <section className="border-t border-teal-100/15 pt-6">
-            <h2 className="text-lg font-extrabold">Profile photo <span className="text-sm font-normal text-teal-100/65">(optional)</span></h2>
+          <section className="border-t border-slate-200 pt-6">
+            <h2 className="text-lg font-extrabold">Profile photo <span className="text-sm font-normal text-slate-500">(optional)</span></h2>
             <div className="mt-4 flex items-center gap-4">
-              {photoPreview ? <img src={photoPreview} alt="Selected profile preview" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-teal-200/40" /> : <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-teal-100/10 text-xl font-bold text-teal-100">+</div>}
+              {photoPreview ? <img src={photoPreview} alt="Selected profile preview" className="h-20 w-20 rounded-2xl object-cover ring-2 ring-blue-200" /> : <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-blue-50 text-xl font-bold text-blue-700">+</div>}
               <label className="cw-auth-secondary cursor-pointer rounded-xl border px-4 py-3 text-sm font-semibold">Select JPG, PNG, or WebP (max 5 MB)<input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={(event) => selectPhoto(event.target.files?.[0] || null)} /></label>
             </div>
           </section>
