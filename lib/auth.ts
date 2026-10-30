@@ -7,15 +7,21 @@ import {
   verifySessionToken,
 } from "@/lib/session";
 
-export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+export async function getCurrentUser(token?: string | null) {
+  let sessionToken = token;
 
-  if (!token) {
+  // When no token argument is supplied, read the session
+  // from the cookies of the current server request.
+  if (sessionToken === undefined) {
+    const cookieStore = await cookies();
+    sessionToken = cookieStore.get(COOKIE_NAME)?.value ?? null;
+  }
+
+  if (!sessionToken) {
     return null;
   }
 
-  const session = await verifySessionToken(token);
+  const session = await verifySessionToken(sessionToken);
 
   if (!session) {
     return null;
