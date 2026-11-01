@@ -35,14 +35,18 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<RegistrationErrors>({});
 
   useEffect(() => {
-    const now = new Date();
+    const timer = window.setTimeout(() => {
+      const now = new Date();
 
-    const localDate = new Date(
-      now.getTime() - now.getTimezoneOffset() * 60000
-    );
+      const localDate = new Date(
+        now.getTime() - now.getTimezoneOffset() * 60000
+      );
 
-    setToday(localDate.toISOString().slice(0, 10));
-    setCurrentYear(now.getFullYear());
+      setToday(localDate.toISOString().slice(0, 10));
+      setCurrentYear(now.getFullYear());
+    }, 0);
+
+    return () => window.clearTimeout(timer);
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {

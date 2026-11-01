@@ -1,18 +1,290 @@
+
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 
-type Doctor = { id: string; fullName: string; email: string; accountStatus: "pending" | "approved" | "rejected"; specialization: string; qualification: string[]; experienceYears: number; consultationFee: number; phone: string; bio: string; profileImageUrl: string; licenseNumber: string; credentialDetails: string; availability: { dayOfWeek: number; startTime: string; endTime: string }[] };
+type Doctor = {
+  id: string;
+  fullName: string;
+  email: string;
+  accountStatus: "pending" | "approved" | "rejected";
+  specialization: string;
+  qualification: string[];
+  experienceYears: number;
+  consultationFee: number;
+  phone: string;
+  bio: string;
+  profileImageUrl: string;
+  licenseNumber: string;
+  credentialDetails: string;
+  availability: {
+    dayOfWeek: number;
+    startTime: string;
+    endTime: string;
+  }[];
+};
+
 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function AdminDashboard({ name }: { name: string }) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  async function load(showLoading = true) { if (showLoading) setLoading(true); try { const response = await fetch("/api/admin/doctors"); const data = await response.json(); if (!response.ok) throw new Error(data.message); setDoctors(data.doctors || []); } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to load applications."); } finally { setLoading(false); } }
-  useEffect(() => { const timer = window.setTimeout(() => { void load(false); }, 0); return () => window.clearTimeout(timer); }, []);
-  async function decide(doctorId: string, status: "approved" | "rejected") { const response = await fetch("/api/admin/doctors", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ doctorId, status }) }); const data = await response.json(); setMessage(data.message || "Unable to update application."); if (response.ok) void load(); }
-  const pending = doctors.filter((doctor) => doctor.accountStatus === "pending");
 
-  return <main className="cw-page px-5 py-10 sm:px-8"><div className="mx-auto max-w-7xl"><header className="cw-hero rounded-3xl p-7 sm:p-10"><p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">CureWell administration</p><h1 className="mt-3 text-3xl font-extrabold text-slate-900">Welcome, {name}</h1><p className="mt-3 text-sm text-slate-600">Review real doctor applications and decide who can access the professional portal.</p></header>{message && <p role="status" className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900">{message}</p>}<section className="mt-7 grid gap-4 sm:grid-cols-3"><div className="cw-card rounded-2xl p-5"><p className="text-sm text-slate-600">Pending applications</p><p className="mt-2 text-3xl font-extrabold text-amber-700">{pending.length}</p></div><div className="cw-card rounded-2xl p-5"><p className="text-sm text-slate-600">Approved doctors</p><p className="mt-2 text-3xl font-extrabold text-emerald-700">{doctors.filter((doctor) => doctor.accountStatus === "approved").length}</p></div><div className="cw-card rounded-2xl p-5"><p className="text-sm text-slate-600">Total applications</p><p className="mt-2 text-3xl font-extrabold text-blue-700">{doctors.length}</p></div></section><section className="mt-7"><h2 className="text-xl font-extrabold text-slate-900">Doctor applications</h2><p className="mt-1 text-sm text-slate-600">Credential details are displayed only to authorized administrators.</p>{loading ? <p className="cw-card mt-5 rounded-2xl p-8 text-center text-sm text-slate-600">Loading applications…</p> : doctors.length === 0 ? <p className="cw-card mt-5 rounded-2xl border-dashed p-10 text-center text-sm text-slate-600">No doctor applications yet.</p> : <div className="mt-5 space-y-4">{doctors.map((doctor) => <article key={doctor.id} className="cw-card rounded-2xl p-5"><div className="flex flex-col gap-5 sm:flex-row"><div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-blue-100 text-xl font-bold text-blue-700">{doctor.profileImageUrl ? <img src={doctor.profileImageUrl} alt={`Profile photo of ${doctor.fullName}`} className="h-full w-full object-cover" /> : doctor.fullName.slice(0, 1)}</div><div className="min-w-0 flex-1"><div className="flex flex-wrap items-start justify-between gap-3"><div><h3 className="font-extrabold text-slate-900">Dr. {doctor.fullName}</h3><p className="mt-1 text-sm text-slate-600">{doctor.email} · {doctor.phone || "No phone provided"}</p></div><span className={`rounded-full px-3 py-1 text-xs font-bold ${doctor.accountStatus === "pending" ? "bg-amber-100 text-amber-800" : doctor.accountStatus === "approved" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}>{doctor.accountStatus}</span></div><div className="mt-4 grid gap-3 text-sm text-slate-800 sm:grid-cols-2 lg:grid-cols-4"><p><strong>Specialty:</strong> {doctor.specialization}</p><p><strong>Experience:</strong> {doctor.experienceYears} years</p><p><strong>Fee:</strong> ₹{doctor.consultationFee}</p><p><strong>License:</strong> {doctor.licenseNumber || "Not provided"}</p></div><p className="mt-3 text-sm text-slate-700">{doctor.qualification.join(" · ")}</p>{doctor.bio && <p className="mt-3 text-sm leading-6 text-slate-700">{doctor.bio}</p>}{doctor.credentialDetails && <p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-800"><strong>Credentials:</strong> {doctor.credentialDetails}</p>}<p className="mt-3 text-xs text-slate-600">Availability: {doctor.availability.map((slot) => `${days[slot.dayOfWeek]} ${slot.startTime}–${slot.endTime}`).join(", ")}</p>{doctor.accountStatus === "pending" && <div className="mt-5 flex gap-3"><button onClick={() => decide(doctor.id, "approved")} className="cw-primary rounded-xl px-4 py-2.5 text-sm font-bold">Approve</button><button onClick={() => decide(doctor.id, "rejected")} className="cw-danger rounded-xl px-4 py-2.5 text-sm font-bold">Reject</button></div>}</div></div></article>)}</div>}</section></div></main>;
+  async function load(showLoading = true) {
+    if (showLoading) setLoading(true);
+
+    try {
+      const response = await fetch("/api/admin/doctors");
+      const data = await response.json();
+
+      if (!response.ok) throw new Error(data.message);
+
+      setDoctors(data.doctors || []);
+    } catch (error) {
+      setMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to load applications."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      void load(false);
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  async function decide(
+    doctorId: string,
+    status: "approved" | "rejected"
+  ) {
+    const response = await fetch("/api/admin/doctors", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ doctorId, status }),
+    });
+
+    const data = await response.json();
+
+    setMessage(data.message || "Unable to update application.");
+
+    if (response.ok) void load();
+  }
+
+  const pending = doctors.filter(
+    (doctor) => doctor.accountStatus === "pending"
+  );
+
+  return (
+    <main className="cw-page px-5 py-10 sm:px-8">
+      <div className="mx-auto max-w-7xl">
+        <header className="cw-hero rounded-3xl p-7 sm:p-10">
+          <p className="text-xs font-bold uppercase tracking-[.18em] text-blue-700">
+            CureWell administration
+          </p>
+
+          <h1 className="mt-3 text-3xl font-extrabold text-slate-900">
+            Welcome, {name}
+          </h1>
+
+          <p className="mt-3 text-sm text-slate-600">
+            Review real doctor applications and decide who can access the
+            professional portal.
+          </p>
+        </header>
+
+        {message && (
+          <p
+            role="status"
+            className="mt-5 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900"
+          >
+            {message}
+          </p>
+        )}
+
+        <section className="mt-7 grid gap-4 sm:grid-cols-3">
+          <div className="cw-card rounded-2xl p-5">
+            <p className="text-sm text-slate-600">
+              Pending applications
+            </p>
+            <p className="mt-2 text-3xl font-extrabold text-amber-700">
+              {pending.length}
+            </p>
+          </div>
+
+          <div className="cw-card rounded-2xl p-5">
+            <p className="text-sm text-slate-600">
+              Approved doctors
+            </p>
+            <p className="mt-2 text-3xl font-extrabold text-emerald-700">
+              {
+                doctors.filter(
+                  (doctor) => doctor.accountStatus === "approved"
+                ).length
+              }
+            </p>
+          </div>
+
+          <div className="cw-card rounded-2xl p-5">
+            <p className="text-sm text-slate-600">
+              Total applications
+            </p>
+            <p className="mt-2 text-3xl font-extrabold text-blue-700">
+              {doctors.length}
+            </p>
+          </div>
+        </section>
+
+        <section className="mt-7">
+          <h2 className="text-xl font-extrabold text-slate-900">
+            Doctor applications
+          </h2>
+
+          <p className="mt-1 text-sm text-slate-600">
+            Credential details are displayed only to authorized administrators.
+          </p>
+
+          {loading ? (
+            <p className="cw-card mt-5 rounded-2xl p-8 text-center text-sm text-slate-600">
+              Loading applications…
+            </p>
+          ) : doctors.length === 0 ? (
+            <p className="cw-card mt-5 rounded-2xl border-dashed p-10 text-center text-sm text-slate-600">
+              No doctor applications yet.
+            </p>
+          ) : (
+            <div className="mt-5 space-y-4">
+              {doctors.map((doctor) => (
+                <article
+                  key={doctor.id}
+                  className="cw-card rounded-2xl p-5"
+                >
+                  <div className="flex flex-col gap-5 sm:flex-row">
+                    <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-blue-100 text-xl font-bold text-blue-700">
+                      {doctor.profileImageUrl ? (
+                        <Image
+                          src={doctor.profileImageUrl}
+                          alt={`Profile photo of ${doctor.fullName}`}
+                          width={64}
+                          height={64}
+                          unoptimized
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        doctor.fullName.slice(0, 1)
+                      )}
+                    </div>
+
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-extrabold text-slate-900">
+                            Dr. {doctor.fullName}
+                          </h3>
+
+                          <p className="mt-1 text-sm text-slate-600">
+                            {doctor.email} ·{" "}
+                            {doctor.phone || "No phone provided"}
+                          </p>
+                        </div>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            doctor.accountStatus === "pending"
+                              ? "bg-amber-100 text-amber-800"
+                              : doctor.accountStatus === "approved"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-rose-100 text-rose-800"
+                          }`}
+                        >
+                          {doctor.accountStatus}
+                        </span>
+                      </div>
+
+                      <div className="mt-4 grid gap-3 text-sm text-slate-800 sm:grid-cols-2 lg:grid-cols-4">
+                        <p>
+                          <strong>Specialty:</strong>{" "}
+                          {doctor.specialization}
+                        </p>
+
+                        <p>
+                          <strong>Experience:</strong>{" "}
+                          {doctor.experienceYears} years
+                        </p>
+
+                        <p>
+                          <strong>Fee:</strong> ₹{doctor.consultationFee}
+                        </p>
+
+                        <p>
+                          <strong>License:</strong>{" "}
+                          {doctor.licenseNumber || "Not provided"}
+                        </p>
+                      </div>
+
+                      <p className="mt-3 text-sm text-slate-700">
+                        {doctor.qualification.join(" · ")}
+                      </p>
+
+                      {doctor.bio && (
+                        <p className="mt-3 text-sm leading-6 text-slate-700">
+                          {doctor.bio}
+                        </p>
+                      )}
+
+                      {doctor.credentialDetails && (
+                        <p className="mt-3 rounded-xl bg-slate-50 p-3 text-sm text-slate-800">
+                          <strong>Credentials:</strong>{" "}
+                          {doctor.credentialDetails}
+                        </p>
+                      )}
+
+                      <p className="mt-3 text-xs text-slate-600">
+                        Availability:{" "}
+                        {doctor.availability
+                          .map(
+                            (slot) =>
+                              `${days[slot.dayOfWeek]} ${slot.startTime}–${slot.endTime}`
+                          )
+                          .join(", ")}
+                      </p>
+
+                      {doctor.accountStatus === "pending" && (
+                        <div className="mt-5 flex gap-3">
+                          <button
+                            onClick={() =>
+                              decide(doctor.id, "approved")
+                            }
+                            className="cw-primary rounded-xl px-4 py-2.5 text-sm font-bold"
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            onClick={() =>
+                              decide(doctor.id, "rejected")
+                            }
+                            className="cw-danger rounded-xl px-4 py-2.5 text-sm font-bold"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      </div>
+    </main>
+  );
 }
