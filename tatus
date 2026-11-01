@@ -1,0 +1,7 @@
+warning: in the working copy of 'app/globals.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'app/page.tsx', LF will be replaced by CRLF the next time Git touches it
+README.md:23: trailing whitespace.
+[32m+[m[32m**Version:** 1.0[m[41m  [m
+README.md:24: trailing whitespace.
+[32m+[m[32m**Status:** Draft / Final Submission[m[41m  [m

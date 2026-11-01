@@ -7,11 +7,14 @@ export type UserRole =
   | "receptionist"
   | "administrator";
 
+export type AccountStatus = "pending" | "approved" | "rejected";
+
 export interface IUser {
   fullName: string;
   email: string;
   passwordHash: string;
   role: UserRole;
+  accountStatus: AccountStatus;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -44,6 +47,14 @@ const UserSchema = new Schema<IUser>(
       enum: ["patient", "doctor", "receptionist", "administrator"],
       required: true,
       default: "patient",
+    },
+    // Existing accounts predate approval workflow and remain usable. New doctor
+    // applications explicitly override this to `pending`.
+    accountStatus: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      required: true,
+      default: "approved",
     },
     isActive: {
       type: Boolean,

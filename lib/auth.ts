@@ -7,15 +7,21 @@ import {
   verifySessionToken,
 } from "@/lib/session";
 
-export async function getCurrentUser() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get(COOKIE_NAME)?.value;
+export async function getCurrentUser(token?: string | null) {
+  let sessionToken = token;
 
-  if (!token) {
+  // When no token argument is supplied, read the session
+  // from the cookies of the current server request.
+  if (sessionToken === undefined) {
+    const cookieStore = await cookies();
+    sessionToken = cookieStore.get(COOKIE_NAME)?.value ?? null;
+  }
+
+  if (!sessionToken) {
     return null;
   }
 
-  const session = await verifySessionToken(token);
+  const session = await verifySessionToken(sessionToken);
 
   if (!session) {
     return null;
@@ -26,7 +32,7 @@ export async function getCurrentUser() {
   const user = await User.findOne({
     _id: session.userId,
     isActive: true,
-  }).select("_id fullName email role");
+  }).select("_id fullName email role accountStatus");
 
   if (!user) {
     return null;
@@ -37,5 +43,6 @@ export async function getCurrentUser() {
     fullName: user.fullName,
     email: user.email,
     role: user.role,
+    accountStatus: user.accountStatus || "approved",
   };
 }
