@@ -22,6 +22,7 @@ export default function DoctorRegistrationPage() {
   const [selectedDays, setSelectedDays] = useState<number[]>([1, 2, 3, 4, 5]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
   const availability = useMemo(
     () =>
@@ -45,11 +46,13 @@ export default function DoctorRegistrationPage() {
     }
 
     setPhoto(file);
+    setMessage("");
     setPhotoPreview(URL.createObjectURL(file));
   }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (loading || submitted) return;
     setMessage("");
 
     const form = new FormData(event.currentTarget);
@@ -69,6 +72,7 @@ export default function DoctorRegistrationPage() {
       form.set("profilePhoto", photo);
     }
 
+    const formElement = event.currentTarget;
     setLoading(true);
 
     try {
@@ -82,7 +86,11 @@ export default function DoctorRegistrationPage() {
       setMessage(data.message || "Unable to submit your application.");
 
       if (response.ok) {
-        event.currentTarget.reset();
+        formElement.reset();
+        if (photoPreview) URL.revokeObjectURL(photoPreview);
+        setPhoto(null);
+        setPhotoPreview("");
+        setSubmitted(true);
       }
     } catch {
       setMessage("Unable to submit your application. Please try again.");
@@ -120,14 +128,14 @@ export default function DoctorRegistrationPage() {
 
         {message && (
           <p
-            role="status"
-            className="mt-6 rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900"
+            role={submitted ? "status" : "alert"}
+            className={`mt-6 rounded-xl border p-4 text-sm ${submitted ? "border-emerald-200 bg-emerald-50 text-emerald-900" : "border-rose-200 bg-rose-50 text-rose-900"}`}
           >
             {message}
           </p>
         )}
 
-        <form onSubmit={submit} className="cw-auth-card mt-6 space-y-6">
+        <form onSubmit={submit} className={`cw-auth-card mt-6 space-y-6 ${submitted ? "opacity-75" : ""}`}>
           <section>
             <h2 className="text-lg font-extrabold">Personal information</h2>
 
@@ -342,12 +350,11 @@ export default function DoctorRegistrationPage() {
           </section>
 
           <button
-            disabled={loading}
+            type="submit"
+            disabled={loading || submitted}
             className="cw-auth-primary w-full rounded-xl px-5 py-3.5 text-sm font-bold transition"
           >
-            {loading
-              ? "Submitting application…"
-              : "Submit for approval"}
+            {loading ? "Submitting application…" : submitted ? "Application submitted" : "Submit for approval"}
           </button>
         </form>
       </div>

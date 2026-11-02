@@ -5,12 +5,15 @@ import Link from "next/link";
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import CureWellLogo from "./CureWellLogo";
+import LogoutButton from "./LogoutButton";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: "⌂" },
   { name: "Appointments", href: "/appointments", icon: "▦" },
   { name: "Find Doctors", href: "/find-doctors", icon: "✚" },
   { name: "Medical Records", href: "/records", icon: "▤" },
+  { name: "Bills", href: "/bills", icon: "₹" },
+  { name: "Notifications", href: "/notifications", icon: "●" },
   { name: "My Profile", href: "/profile", icon: "♙" },
   { name: "Settings", href: "/settings", icon: "⚙" },
 ];
@@ -172,6 +175,7 @@ export default function PatientSidebar({
           </div>
 
           <div className="mt-5 border-t border-slate-100 pt-4 text-center">
+            <LogoutButton className="mb-4 w-full rounded-xl border border-rose-200 px-4 py-2.5 text-sm font-bold text-rose-700 transition hover:bg-rose-50" />
             <p className="text-[11px] font-semibold text-slate-500">
               CureWell Multispecialty Hospital
             </p>

@@ -249,6 +249,13 @@ function LoginForm() {
               Are you a doctor? Apply to join CureWell
             </Link>
 
+            <Link
+              href="/receptionist/register"
+              className="mt-2 flex w-full items-center justify-center rounded-xl px-5 py-2.5 text-sm font-semibold text-amber-700 transition hover:bg-amber-50 hover:text-amber-900"
+            >
+              Are you a receptionist? Apply to join CureWell
+            </Link>
+
             <p className="mt-8 text-center text-xs leading-5 text-slate-500">
               Your session is protected by CureWell&apos;s secure sign-in
               system.

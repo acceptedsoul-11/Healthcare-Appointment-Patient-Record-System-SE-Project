@@ -1,0 +1,10 @@
+import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
+import { requireApiUser } from "@/lib/api-auth";
+import { connectDB } from "@/lib/mongodb";
+import { createNotification } from "@/lib/notifications";
+import { writeAuditLog } from "@/lib/audit";
+import User from "@/models/User";
+
+export async function GET() { const auth = await requireApiUser(["administrator"]); if (auth.response) return auth.response; await connectDB(); const users = await User.find({}).select("fullName email role accountStatus isActive createdAt").sort({ createdAt: -1 }).lean(); return NextResponse.json({ users }); }
+export async function PATCH(request: NextRequest) { const auth = await requireApiUser(["administrator"]); if (auth.response) return auth.response; try { const body = (await request.json()) as { userId?: string; isActive?: boolean; accountStatus?: string }; if (!body.userId || !mongoose.isValidObjectId(body.userId) || (typeof body.isActive !== "boolean" && !["pending", "approved", "rejected"].includes(body.accountStatus || ""))) return NextResponse.json({ message: "A valid account update is required." }, { status: 400 }); await connectDB(); const update: Record<string, unknown> = {}; if (typeof body.isActive === "boolean") update.isActive = body.isActive; if (body.accountStatus) update.accountStatus = body.accountStatus; const user = await User.findByIdAndUpdate(body.userId, { $set: update }, { returnDocument: "after" }); if (!user) return NextResponse.json({ message: "Account not found." }, { status: 404 }); await createNotification({ userId: user._id, type: "account", title: "Account status updated", message: user.isActive ? "Your CureWell account is active." : "Your CureWell account has been deactivated." }); await writeAuditLog({ actorId: auth.user!.id, action: "user_account_updated", resourceType: "User", resourceId: user._id, metadata: update }); return NextResponse.json({ message: "Account updated." }); } catch (error) { console.error(error); return NextResponse.json({ message: "Unable to update account." }, { status: 500 }); } }

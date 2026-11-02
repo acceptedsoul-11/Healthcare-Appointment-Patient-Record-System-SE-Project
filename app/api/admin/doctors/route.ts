@@ -4,6 +4,9 @@ import { getCurrentUser } from "@/lib/auth";
 import { connectDB } from "@/lib/mongodb";
 import Doctor from "@/models/Doctor";
 import User from "@/models/User";
+import { createNotification } from "@/lib/notifications";
+import { writeAuditLog } from "@/lib/audit";
+import { doctorNameWithoutTitle } from "@/lib/display-names";
 
 async function requireAdministrator() {
   const currentUser = await getCurrentUser();
@@ -37,7 +40,7 @@ export async function GET() {
           return {
             id: doctor._id.toString(),
             userId: user._id.toString(),
-            fullName: user.fullName,
+            fullName: doctorNameWithoutTitle(user.fullName),
             email: user.email,
             accountStatus: user.accountStatus || "approved",
             isActive: user.isActive,
@@ -47,7 +50,7 @@ export async function GET() {
             consultationFee: doctor.consultationFee,
             phone: doctor.phone || "",
             bio: doctor.bio || "",
-            profileImageUrl: doctor.profileImageUrl || "",
+            profileImageUrl: doctor.profileImageUrl || `/api/doctor-photos?id=${doctor._id.toString()}`,
             licenseNumber: doctor.licenseNumber || "",
             credentialDetails: doctor.credentialDetails || "",
             availability: doctor.availability,
@@ -74,7 +77,16 @@ export async function PATCH(request: NextRequest) {
     await connectDB();
     const doctor = await Doctor.findById(body.doctorId).select("userId");
     if (!doctor) return NextResponse.json({ message: "Doctor application not found." }, { status: 404 });
-    await User.findByIdAndUpdate(doctor.userId, { accountStatus: body.status });
+    const updated = await User.findByIdAndUpdate(doctor.userId, { accountStatus: body.status }, { returnDocument: "after" });
+    if (updated) {
+      await createNotification({
+        userId: updated._id,
+        type: "account",
+        title: `Doctor application ${body.status}`,
+        message: body.status === "approved" ? "Your CureWell doctor application was approved." : "Your CureWell doctor application was rejected.",
+      });
+      await writeAuditLog({ actorId: (await getCurrentUser())!.id, action: `doctor_application_${body.status}`, resourceType: "User", resourceId: updated._id });
+    }
     return NextResponse.json({ message: `Doctor application ${body.status}.` });
   } catch (error) {
     console.error("PATCH /api/admin/doctors failed:", error);

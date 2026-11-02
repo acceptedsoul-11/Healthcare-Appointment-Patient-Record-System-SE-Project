@@ -1,4 +1,6 @@
-import { createHash } from "crypto";
+import { mkdir, writeFile } from "fs/promises";
+import path from "path";
+import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
@@ -15,47 +17,17 @@ function readText(formData: FormData, key: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-async function uploadProfileImage(file: File) {
+async function storeProfileImage(file: File) {
   if (!allowedImageTypes.has(file.type) || file.size > maxImageBytes) {
     throw new Error("Profile photos must be a JPG, PNG, or WebP image under 5 MB.");
   }
 
-  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
-  const apiKey = process.env.CLOUDINARY_API_KEY;
-  const apiSecret = process.env.CLOUDINARY_API_SECRET;
-
-  if (!cloudName || !apiKey || !apiSecret) {
-    throw new Error("Photo uploads are not configured yet. Please contact the hospital administrator.");
-  }
-
-  const timestamp = Math.floor(Date.now() / 1000);
-  const folder = "curewell/doctor-profiles";
-  const signature = createHash("sha1")
-    .update(`folder=${folder}&timestamp=${timestamp}${apiSecret}`)
-    .digest("hex");
-
-  const upload = new FormData();
-  upload.append("file", file);
-  upload.append("api_key", apiKey);
-  upload.append("timestamp", String(timestamp));
-  upload.append("folder", folder);
-  upload.append("signature", signature);
-
-  const response = await fetch(
-    `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-    { method: "POST", body: upload }
-  );
-  const payload = (await response.json()) as {
-    secure_url?: string;
-    public_id?: string;
-    error?: { message?: string };
-  };
-
-  if (!response.ok || !payload.secure_url) {
-    throw new Error(payload.error?.message || "Unable to upload the profile photo.");
-  }
-
-  return { url: payload.secure_url, publicId: payload.public_id || "" };
+  const storageRoot = path.join(process.cwd(), process.env.PRIVATE_UPLOAD_DIR || ".private-uploads");
+  const storageKey = `doctor-profiles/${randomUUID()}.${file.type.split("/")[1] || "bin"}`;
+  const absolutePath = path.join(storageRoot, storageKey);
+  await mkdir(path.dirname(absolutePath), { recursive: true });
+  await writeFile(absolutePath, Buffer.from(await file.arrayBuffer()), { flag: "wx" });
+  return { storageKey };
 }
 
 export async function POST(request: Request) {
@@ -103,6 +75,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const seenDays = new Set<number>();
     const availabilityIsValid = availability.every((slot) => {
       if (!slot || typeof slot !== "object") return false;
       const item = slot as Record<string, unknown>;
@@ -110,11 +83,13 @@ export async function POST(request: Request) {
         Number.isInteger(item.dayOfWeek) &&
         Number(item.dayOfWeek) >= 0 &&
         Number(item.dayOfWeek) <= 6 &&
+        !seenDays.has(Number(item.dayOfWeek)) &&
         typeof item.startTime === "string" &&
         typeof item.endTime === "string" &&
         /^([01]\d|2[0-3]):[0-5]\d$/.test(item.startTime) &&
         /^([01]\d|2[0-3]):[0-5]\d$/.test(item.endTime) &&
-        item.startTime < item.endTime
+        item.startTime < item.endTime &&
+        Boolean(seenDays.add(Number(item.dayOfWeek)))
       );
     });
 
@@ -123,7 +98,7 @@ export async function POST(request: Request) {
     }
 
     const photo = formData.get("profilePhoto");
-    const uploadedImage = photo instanceof File && photo.size > 0 ? await uploadProfileImage(photo) : null;
+    const uploadedImage = photo instanceof File && photo.size > 0 ? await storeProfileImage(photo) : null;
 
     await connectDB();
     const passwordHash = await bcrypt.hash(password, 12);
@@ -148,8 +123,7 @@ export async function POST(request: Request) {
               licenseNumber,
               credentialDetails: credentialDetails || undefined,
               availability,
-              profileImageUrl: uploadedImage?.url,
-              profileImagePublicId: uploadedImage?.publicId || undefined,
+              profileImageStorageKey: uploadedImage?.storageKey,
             },
           ],
           { session }

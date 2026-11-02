@@ -20,8 +20,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: Arial, Helvetica, sans-serif;
+  --font-mono: "Courier New", monospace;
 }
 
 * { box-sizing: border-box; }
@@ -115,3 +115,13 @@ button:focus-visible, a:focus-visible, [role="button"]:focus-visible, select:foc
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }
+
+@media print {
+  body { background: #fff !important; }
+  aside, nav, button, input, select, textarea, header:not(.document-header), .cw-hero, .print\:hidden { display: none !important; }
+  .print-document { display: block !important; border: 0 !important; margin: 0 !important; }
+  .document-header, .document-footer { display: block !important; }
+}
+
+.document-page { overflow: hidden; }
+.document-watermark { position: absolute; inset: 35% 0 auto; text-align: center; font-size: 4rem; font-weight: 800; letter-spacing: .35em; color: rgb(29 78 216 / 0.06); transform: rotate(-25deg); pointer-events: none; }
