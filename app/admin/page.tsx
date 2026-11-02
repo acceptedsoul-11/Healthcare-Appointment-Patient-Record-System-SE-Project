@@ -2,11 +2,12 @@
 import { Suspense } from "react";
 import AdminDashboard from "@/components/AdminDashboard";
 import { requireRole } from "@/lib/require-role";
+import RoleSidebar from "@/components/RoleSidebar";
 
 async function AdminContent() {
   const user = await requireRole(["administrator"]);
 
-  return <AdminDashboard name={user.fullName} />;
+  return <div className="min-h-screen bg-[#F1F6FA] lg:flex"><RoleSidebar role="administrator" /><div className="min-w-0 flex-1"><AdminDashboard name={user.fullName} /></div></div>;
 }
 
 export default function AdminPage() {

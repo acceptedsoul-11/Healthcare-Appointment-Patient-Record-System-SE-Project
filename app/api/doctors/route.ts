@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import Doctor from "@/models/Doctor";
 import { getCurrentUser } from "@/lib/auth";
 import { COOKIE_NAME } from "@/lib/session";
+import { doctorNameWithoutTitle } from "@/lib/display-names";
 
 export async function GET(request: NextRequest) {
   // Keep request-dependent access outside the try/catch.
@@ -54,13 +55,13 @@ export async function GET(request: NextRequest) {
 
         return {
           id: doctor._id.toString(),
-          name: user.fullName,
+          name: doctorNameWithoutTitle(user.fullName),
           specialization: doctor.specialization,
           qualification: doctor.qualification,
           consultationFee: doctor.consultationFee,
           experienceYears: doctor.experienceYears,
           bio: doctor.bio || "",
-          profileImageUrl: doctor.profileImageUrl || "",
+          profileImageUrl: doctor.profileImageUrl || `/api/doctor-photos?id=${doctor._id.toString()}`,
           availability: doctor.availability,
         };
       });

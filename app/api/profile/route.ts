@@ -61,7 +61,7 @@ export async function PATCH(request: NextRequest) {
         gender,
         emergencyContact: emergencyContact.name || emergencyContact.phone ? emergencyContact : undefined,
       },
-      { new: true }
+      { returnDocument: "after" }
     );
     return NextResponse.json({ message: "Profile updated successfully." });
   } catch (error) {

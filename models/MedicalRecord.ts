@@ -12,8 +12,17 @@ export interface IMedicalRecord {
     medication: string;
     dosage: string;
     frequency: string;
+    route?: string;
+    timing?: string;
     duration?: string;
+    quantity?: string;
+    instructions?: string;
   }[];
+  followUpDate?: Date;
+  version: number;
+  isCurrent: boolean;
+  supersededAt?: Date;
+  supersededBy?: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -73,13 +82,22 @@ const MedicalRecordSchema = new Schema<IMedicalRecord>(
           trim: true,
           maxlength: 100,
         },
+        route: { type: String, trim: true, maxlength: 100 },
+        timing: { type: String, trim: true, maxlength: 100 },
         duration: {
           type: String,
           trim: true,
           maxlength: 100,
         },
+        quantity: { type: String, trim: true, maxlength: 100 },
+        instructions: { type: String, trim: true, maxlength: 500 },
       },
     ],
+    followUpDate: Date,
+    version: { type: Number, required: true, default: 1, min: 1 },
+    isCurrent: { type: Boolean, required: true, default: true, index: true },
+    supersededAt: Date,
+    supersededBy: { type: Schema.Types.ObjectId, ref: "MedicalRecord" },
   },
   {
     timestamps: true,

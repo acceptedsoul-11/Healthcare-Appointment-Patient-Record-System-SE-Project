@@ -17,6 +17,14 @@ export interface IAppointment {
   reason: string;
   status: AppointmentStatus;
   notes?: string;
+  durationMinutes: number;
+  checkedInAt?: Date;
+  confirmedAt?: Date;
+  completedAt?: Date;
+  cancelledAt?: Date;
+  cancelledBy?: Types.ObjectId;
+  followUpRecommendedDate?: Date;
+  followUpIntervalDays?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -68,6 +76,20 @@ const AppointmentSchema = new Schema<IAppointment>(
       trim: true,
       maxlength: 2000,
     },
+    durationMinutes: {
+      type: Number,
+      required: true,
+      min: 15,
+      max: 240,
+      default: 30,
+    },
+    checkedInAt: Date,
+    confirmedAt: Date,
+    completedAt: Date,
+    cancelledAt: Date,
+    cancelledBy: { type: Schema.Types.ObjectId, ref: "User" },
+    followUpRecommendedDate: Date,
+    followUpIntervalDays: { type: Number, min: 1, max: 365 },
   },
   {
     timestamps: true,

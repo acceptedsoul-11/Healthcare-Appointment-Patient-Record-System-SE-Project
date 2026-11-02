@@ -1,31 +1,10 @@
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
-
-import { getCurrentUser } from "@/lib/auth";
+import { requireApiUser } from "@/lib/api-auth";
 import { connectDB } from "@/lib/mongodb";
+import { writeAuditLog } from "@/lib/audit";
 import User from "@/models/User";
 
-export async function POST(request: NextRequest) {
-  const currentUser = await getCurrentUser();
-  if (currentUser?.role !== "administrator") {
-    return NextResponse.json({ message: "Administrator access is required." }, { status: 403 });
-  }
-  try {
-    const body = (await request.json()) as { fullName?: string; email?: string; password?: string; role?: string };
-    const fullName = body.fullName?.trim() || "";
-    const email = body.email?.trim().toLowerCase() || "";
-    const role = body.role === "administrator" || body.role === "receptionist" ? body.role : null;
-    if (fullName.length < 2 || !/^\S+@\S+\.\S+$/.test(email) || !body.password || body.password.length < 8 || !role) {
-      return NextResponse.json({ message: "Enter a valid staff name, email, password, and role." }, { status: 400 });
-    }
-    await connectDB();
-    await User.create({ fullName, email, passwordHash: await bcrypt.hash(body.password, 12), role, accountStatus: "approved" });
-    return NextResponse.json({ message: "Staff account created." }, { status: 201 });
-  } catch (error) {
-    if (error && typeof error === "object" && "code" in error && error.code === 11000) {
-      return NextResponse.json({ message: "An account with this email already exists." }, { status: 409 });
-    }
-    console.error("Staff account creation failed:", error);
-    return NextResponse.json({ message: "Unable to create staff account." }, { status: 500 });
-  }
-}
+export async function GET() { const auth = await requireApiUser(["administrator"]); if (auth.response) return auth.response; await connectDB(); return NextResponse.json({ staff: await User.find({ role: { $in: ["receptionist", "administrator"] } }).select("fullName email role isActive accountStatus createdAt").sort({ createdAt: -1 }).lean() }); }
+export async function POST(request: NextRequest) { const auth = await requireApiUser(["administrator"]); if (auth.response) return auth.response; try { const body = (await request.json()) as { fullName?: string; email?: string; password?: string; role?: string }; const fullName = body.fullName?.trim() || ""; const email = body.email?.trim().toLowerCase() || ""; const role = body.role === "administrator" || body.role === "receptionist" ? body.role : null; if (fullName.length < 2 || !/^\S+@\S+\.\S+$/.test(email) || !body.password || body.password.length < 8 || !role) return NextResponse.json({ message: "Enter a valid staff name, email, password, and role." }, { status: 400 }); await connectDB(); const user = await User.create({ fullName, email, passwordHash: await bcrypt.hash(body.password, 12), role, accountStatus: "approved" }); await writeAuditLog({ actorId: auth.user!.id, action: "staff_account_created", resourceType: "User", resourceId: user._id, metadata: { role } }); return NextResponse.json({ message: "Staff account created." }, { status: 201 }); } catch (error) { if (error && typeof error === "object" && "code" in error && error.code === 11000) return NextResponse.json({ message: "An account with this email already exists." }, { status: 409 }); console.error(error); return NextResponse.json({ message: "Unable to create staff account." }, { status: 500 }); } }
+export async function PATCH(request: NextRequest) { const auth = await requireApiUser(["administrator"]); if (auth.response) return auth.response; const body = (await request.json()) as { userId?: string; isActive?: boolean }; if (!body.userId || typeof body.isActive !== "boolean") return NextResponse.json({ message: "A valid staff update is required." }, { status: 400 }); await connectDB(); const user = await User.findOneAndUpdate({ _id: body.userId, role: { $in: ["receptionist", "administrator"] } }, { $set: { isActive: body.isActive } }, { returnDocument: "after" }); if (!user) return NextResponse.json({ message: "Staff account not found." }, { status: 404 }); await writeAuditLog({ actorId: auth.user!.id, action: "staff_account_status_changed", resourceType: "User", resourceId: user._id, metadata: { isActive: body.isActive } }); return NextResponse.json({ message: "Staff account updated." }); }

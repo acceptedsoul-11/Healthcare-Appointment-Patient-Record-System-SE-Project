@@ -11,6 +11,7 @@ export interface IDoctor {
   bio?: string;
   profileImageUrl?: string;
   profileImagePublicId?: string;
+  profileImageStorageKey?: string;
   licenseNumber?: string;
   credentialDetails?: string;
   availability: {
@@ -75,6 +76,11 @@ const DoctorSchema = new Schema<IDoctor>(
       maxlength: 2000,
     },
     profileImagePublicId: {
+      type: String,
+      trim: true,
+      maxlength: 500,
+    },
+    profileImageStorageKey: {
       type: String,
       trim: true,
       maxlength: 500,

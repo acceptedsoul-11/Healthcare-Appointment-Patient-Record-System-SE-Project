@@ -1,373 +1,81 @@
-
 import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/mongodb";
-import { getCurrentUser } from "@/lib/auth";
-import Appointment from "@/models/Appointment";
+import { requireApiUser } from "@/lib/api-auth";
+import { createNotification } from "@/lib/notifications";
+import { writeAuditLog } from "@/lib/audit";
+import Appointment, { type AppointmentStatus } from "@/models/Appointment";
 import Doctor from "@/models/Doctor";
 import Patient from "@/models/Patient";
+import User from "@/models/User";
+import { doctorNameWithoutTitle } from "@/lib/display-names";
+
+const activeStatuses: AppointmentStatus[] = ["scheduled", "confirmed"];
+const transitions: Record<AppointmentStatus, AppointmentStatus[]> = { scheduled: ["confirmed", "cancelled", "no_show"], confirmed: ["completed", "cancelled", "no_show"], completed: [], cancelled: [], no_show: [] };
+
+function minutes(value: string) { const [hour, minute] = value.split(":").map(Number); return hour * 60 + minute; }
+function dateOnly(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null; const date = new Date(`${value}T00:00:00.000Z`); return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date; }
+function isFutureInHospitalTime(dateValue: string, startTime: string) { const [year, month, day] = dateValue.split("-").map(Number); const [hour, minute] = startTime.split(":").map(Number); return new Date(Date.UTC(year, month - 1, day, hour - 5, minute - 30)) > new Date(); }
+
+type AppointmentDisplayDocument = { _id: { toString(): string }; appointmentDate: Date; startTime: string; endTime: string; durationMinutes?: number; reason: string; status: AppointmentStatus; notes?: string; checkedInAt?: Date | null; patientId?: { _id: { toString(): string }; userId?: { fullName?: string; email?: string } } | null; doctorId?: { _id: { toString(): string }; userId?: { fullName?: string; email?: string }; specialization?: string; consultationFee?: number } | null };
+
+async function validateSlot(doctorId: string, appointmentDate: string, startTime: string, durationMinutes: number, excludeId?: string) {
+  const date = dateOnly(appointmentDate);
+  if (!date) return { error: "Invalid appointment date." };
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime)) return { error: "Invalid appointment time." };
+  if (!Number.isInteger(durationMinutes) || durationMinutes < 15 || durationMinutes > 240) return { error: "Appointment duration must be between 15 and 240 minutes." };
+  if (!isFutureInHospitalTime(appointmentDate, startTime)) return { error: "Please select a future appointment date and time." };
+  const doctor = await Doctor.findById(doctorId);
+  if (!doctor) return { error: "The selected doctor was not found." };
+  const doctorUser = await User.findById(doctor.userId).select("isActive accountStatus");
+  if (!doctorUser?.isActive || doctorUser.accountStatus !== "approved") return { error: "The selected doctor is not currently available for bookings." };
+  const slot = doctor.availability.find((item) => item.dayOfWeek === date.getUTCDay());
+  if (!slot) return { error: "This doctor is not available on the selected day." };
+  const start = minutes(startTime); const end = start + durationMinutes;
+  if (start < minutes(slot.startTime) || end > minutes(slot.endTime)) return { error: "The selected time is outside the doctor's available hours." };
+  const conflictFilter: Record<string, unknown> = { doctorId, appointmentDate: date, status: { $in: activeStatuses } };
+  if (excludeId) conflictFilter._id = { $ne: excludeId };
+  const conflicting = await Appointment.findOne(conflictFilter).select("startTime endTime").lean();
+  if (conflicting && start < minutes(conflicting.endTime) && end > minutes(conflicting.startTime)) return { error: "That time slot has already been booked. Please choose another." };
+  return { date, doctor };
+}
+
+function serialize(appointment: AppointmentDisplayDocument) {
+  const patient = appointment.patientId; const doctor = appointment.doctorId;
+  return { id: appointment._id.toString(), appointmentDate: appointment.appointmentDate, startTime: appointment.startTime, endTime: appointment.endTime, durationMinutes: appointment.durationMinutes || 30, reason: appointment.reason, status: appointment.status, notes: appointment.notes || "", checkedInAt: appointment.checkedInAt || null, patient: patient ? { id: patient._id.toString(), name: patient.userId?.fullName || "Patient", email: patient.userId?.email || "" } : null, doctor: doctor ? { id: doctor._id.toString(), name: doctorNameWithoutTitle(doctor.userId?.fullName || "Doctor"), email: doctor.userId?.email || "", specialization: doctor.specialization || "", consultationFee: doctor.consultationFee ?? 0 } : null };
+}
 
 export async function GET() {
-  try {
-    const currentUser = await getCurrentUser();
-
-    if (!currentUser) {
-      return NextResponse.json(
-        { message: "Please sign in to view appointments." },
-        { status: 401 }
-      );
-    }
-
-    await connectDB();
-
-    let filter: Record<string, unknown> = {};
-
-    if (currentUser.role === "patient") {
-      const patient = await Patient.findOne({
-        userId: currentUser.id,
-      }).select("_id");
-
-      if (!patient) {
-        return NextResponse.json({ appointments: [] });
-      }
-
-      filter = { patientId: patient._id };
-    } else if (currentUser.role === "doctor") {
-      const doctor = await Doctor.findOne({
-        userId: currentUser.id,
-      }).select("_id");
-
-      if (!doctor) {
-        return NextResponse.json({ appointments: [] });
-      }
-
-      filter = { doctorId: doctor._id };
-    } else if (
-      currentUser.role !== "receptionist" &&
-      currentUser.role !== "administrator"
-    ) {
-      return NextResponse.json(
-        { message: "You are not authorized to view appointments." },
-        { status: 403 }
-      );
-    }
-
-    const appointments = await Appointment.find(filter)
-      .sort({ appointmentDate: 1, startTime: 1 })
-      .populate({
-        path: "patientId",
-        populate: {
-          path: "userId",
-          select: "fullName email",
-        },
-      })
-      .populate({
-        path: "doctorId",
-        populate: {
-          path: "userId",
-          select: "fullName email",
-        },
-      })
-      .lean();
-
-    const result = appointments.map((appointment) => {
-      const patient = appointment.patientId as unknown as {
-        _id: { toString(): string };
-        userId?: { fullName?: string; email?: string } | null;
-      } | null;
-
-      const doctor = appointment.doctorId as unknown as {
-        _id: { toString(): string };
-        specialization?: string;
-        consultationFee?: number;
-        userId?: { fullName?: string; email?: string } | null;
-      } | null;
-
-      return {
-        id: appointment._id.toString(),
-        appointmentDate: appointment.appointmentDate,
-        startTime: appointment.startTime,
-        endTime: appointment.endTime,
-        reason: appointment.reason,
-        status: appointment.status,
-        notes: appointment.notes || "",
-        patient: patient
-          ? {
-              id: patient._id.toString(),
-              name: patient.userId?.fullName || "Patient",
-              email: patient.userId?.email || "",
-            }
-          : null,
-        doctor: doctor
-          ? {
-              id: doctor._id.toString(),
-              name: doctor.userId?.fullName || "Doctor",
-              email: doctor.userId?.email || "",
-              specialization: doctor.specialization || "",
-              consultationFee: doctor.consultationFee ?? 0,
-            }
-          : null,
-      };
-    });
-
-    return NextResponse.json({ appointments: result });
-  } catch (error) {
-    console.error("GET /api/appointments failed:", error);
-
-    return NextResponse.json(
-      { message: "Unable to retrieve appointments." },
-      { status: 500 }
-    );
-  }
+  const auth = await requireApiUser(["patient", "doctor", "receptionist", "administrator"]); if (auth.response) return auth.response;
+  try { await connectDB(); const currentUser = auth.user!; const filter: Record<string, unknown> = {};
+    if (currentUser.role === "patient") { const patient = await Patient.findOne({ userId: currentUser.id }).select("_id"); if (!patient) return NextResponse.json({ appointments: [] }); filter.patientId = patient._id; }
+    else if (currentUser.role === "doctor") { const doctor = await Doctor.findOne({ userId: currentUser.id }).select("_id"); if (!doctor) return NextResponse.json({ appointments: [] }); filter.doctorId = doctor._id; }
+    const appointments = await Appointment.find(filter).sort({ appointmentDate: 1, startTime: 1 }).populate({ path: "patientId", populate: { path: "userId", select: "fullName email" } }).populate({ path: "doctorId", populate: { path: "userId", select: "fullName email" } }).lean();
+    return NextResponse.json({ appointments: appointments.map(serialize) });
+  } catch (error) { console.error("GET /api/appointments failed:", error); return NextResponse.json({ message: "Unable to retrieve appointments." }, { status: 500 }); }
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const currentUser = await getCurrentUser();
+  const auth = await requireApiUser(["patient", "receptionist"]); if (auth.response) return auth.response;
+  try { const body = (await request.json()) as Record<string, unknown>; const doctorId = typeof body.doctorId === "string" ? body.doctorId.trim() : ""; const appointmentDate = typeof body.appointmentDate === "string" ? body.appointmentDate.trim() : ""; const startTime = typeof body.startTime === "string" ? body.startTime.trim() : ""; const reason = typeof body.reason === "string" ? body.reason.trim() : ""; const durationMinutes = typeof body.durationMinutes === "number" ? body.durationMinutes : 30;
+    if (!mongoose.isValidObjectId(doctorId) || !reason || reason.length > 500) return NextResponse.json({ message: "Doctor and a valid reason are required." }, { status: 400 });
+    await connectDB(); const slot = await validateSlot(doctorId, appointmentDate, startTime, durationMinutes); if (slot.error) return NextResponse.json({ message: slot.error }, { status: 400 });
+    let patientId: mongoose.Types.ObjectId | undefined; if (auth.user!.role === "patient") { const patient = await Patient.findOne({ userId: auth.user!.id }).select("_id"); patientId = patient?._id; } else if (typeof body.patientId === "string" && mongoose.isValidObjectId(body.patientId)) patientId = new mongoose.Types.ObjectId(body.patientId);
+    if (!patientId || !(await Patient.exists({ _id: patientId }))) return NextResponse.json({ message: "A valid patient is required." }, { status: 400 });
+    const end = minutes(startTime) + durationMinutes; const appointment = await Appointment.create({ patientId, doctorId, appointmentDate: slot.date, startTime, endTime: `${String(Math.floor(end / 60)).padStart(2, "0")}:${String(end % 60).padStart(2, "0")}`, durationMinutes, reason, status: "scheduled" });
+    await createNotification({ userId: slot.doctor!.userId, type: "appointment", title: "New appointment booked", message: `A patient appointment is scheduled for ${appointmentDate} at ${startTime}.`, resourceType: "Appointment", resourceId: appointment._id }); await writeAuditLog({ actorId: auth.user!.id, action: "appointment_created", resourceType: "Appointment", resourceId: appointment._id, metadata: { role: auth.user!.role } });
+    return NextResponse.json({ message: "Appointment booked successfully.", appointment: serialize(appointment) }, { status: 201 });
+  } catch (error) { console.error("POST /api/appointments failed:", error); return NextResponse.json({ message: "Unable to book the appointment." }, { status: 500 }); }
+}
 
-    if (!currentUser) {
-      return NextResponse.json(
-        { message: "Please sign in before booking." },
-        { status: 401 }
-      );
-    }
-
-    if (currentUser.role !== "patient") {
-      return NextResponse.json(
-        { message: "Only patient accounts can book appointments." },
-        { status: 403 }
-      );
-    }
-
-    let body: unknown;
-
-    try {
-      body = await request.json();
-    } catch {
-      return NextResponse.json(
-        { message: "Invalid request body." },
-        { status: 400 }
-      );
-    }
-
-    if (!body || typeof body !== "object") {
-      return NextResponse.json(
-        { message: "Invalid booking details." },
-        { status: 400 }
-      );
-    }
-
-    const data = body as Record<string, unknown>;
-
-    const doctorId =
-      typeof data.doctorId === "string" ? data.doctorId.trim() : "";
-    const appointmentDate =
-      typeof data.appointmentDate === "string"
-        ? data.appointmentDate.trim()
-        : "";
-    const startTime =
-      typeof data.startTime === "string" ? data.startTime.trim() : "";
-    const reason = typeof data.reason === "string" ? data.reason.trim() : "";
-
-    if (!doctorId || !appointmentDate || !startTime || !reason) {
-      return NextResponse.json(
-        { message: "Doctor, date, time and reason are required." },
-        { status: 400 }
-      );
-    }
-
-    if (reason.length > 500) {
-      return NextResponse.json(
-        { message: "The reason must be 500 characters or fewer." },
-        { status: 400 }
-      );
-    }
-
-    if (!/^[a-f\d]{24}$/i.test(doctorId)) {
-      return NextResponse.json(
-        { message: "Invalid doctor selection." },
-        { status: 400 }
-      );
-    }
-
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(appointmentDate)) {
-      return NextResponse.json(
-        { message: "Invalid appointment date." },
-        { status: 400 }
-      );
-    }
-
-    if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime)) {
-      return NextResponse.json(
-        { message: "Invalid appointment time." },
-        { status: 400 }
-      );
-    }
-
-    const date = new Date(`${appointmentDate}T00:00:00.000Z`);
-
-    if (
-      Number.isNaN(date.getTime()) ||
-      date.toISOString().slice(0, 10) !== appointmentDate
-    ) {
-      return NextResponse.json(
-        { message: "Invalid appointment date." },
-        { status: 400 }
-      );
-    }
-
-    // Appointment times use the hospital's local clock.
-    // This implementation assumes the hospital is in India (IST).
-    const [year, month, day] = appointmentDate.split("-").map(Number);
-    const [hour, minute] = startTime.split(":").map(Number);
-    const requestedDateTime = new Date(
-      Date.UTC(year, month - 1, day, hour - 5, minute - 30)
-    );
-
-    if (requestedDateTime <= new Date()) {
-      return NextResponse.json(
-        { message: "Please select a future appointment date and time." },
-        { status: 400 }
-      );
-    }
-
-    await connectDB();
-
-    const patient = await Patient.findOne({
-      userId: currentUser.id,
-    });
-
-    if (!patient) {
-      return NextResponse.json(
-        {
-          message:
-            "Your patient profile is missing. Please contact reception.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const doctor = await Doctor.findById(doctorId);
-
-    if (!doctor) {
-      return NextResponse.json(
-        { message: "The selected doctor was not found." },
-        { status: 404 }
-      );
-    }
-
-    const doctorUser = await import("@/models/User").then(({ default: User }) =>
-      User.findById(doctor.userId).select("isActive accountStatus")
-    );
-
-    if (
-      !doctorUser ||
-      !doctorUser.isActive ||
-      (doctorUser.accountStatus && doctorUser.accountStatus !== "approved")
-    ) {
-      return NextResponse.json(
-        { message: "The selected doctor is not currently available for bookings." },
-        { status: 400 }
-      );
-    }
-
-    const dayOfWeek = date.getUTCDay();
-    const availability = doctor.availability.find(
-      (slot) => slot.dayOfWeek === dayOfWeek
-    );
-
-    if (!availability) {
-      return NextResponse.json(
-        { message: "This doctor is not available on the selected day." },
-        { status: 400 }
-      );
-    }
-
-    const slotDuration = 30;
-    const requestedStart = hour * 60 + minute;
-    const requestedEnd = requestedStart + slotDuration;
-
-    const availabilityStart =
-      Number(availability.startTime.slice(0, 2)) * 60 +
-      Number(availability.startTime.slice(3, 5));
-
-    const availabilityEnd =
-      Number(availability.endTime.slice(0, 2)) * 60 +
-      Number(availability.endTime.slice(3, 5));
-
-    if (
-      requestedStart < availabilityStart ||
-      requestedEnd > availabilityEnd ||
-      requestedStart % slotDuration !== 0
-    ) {
-      return NextResponse.json(
-        {
-          message:
-            "The selected time is outside the doctor's available hours.",
-        },
-        { status: 400 }
-      );
-    }
-
-    const existingAppointments = await Appointment.find({
-      doctorId: doctor._id,
-      appointmentDate: date,
-      status: { $in: ["scheduled", "confirmed"] },
-    }).select("startTime endTime");
-
-    const overlaps = existingAppointments.some((appointment) => {
-      const existingStart =
-        Number(appointment.startTime.slice(0, 2)) * 60 +
-        Number(appointment.startTime.slice(3, 5));
-
-      const existingEnd =
-        Number(appointment.endTime.slice(0, 2)) * 60 +
-        Number(appointment.endTime.slice(3, 5));
-
-      return requestedStart < existingEnd && requestedEnd > existingStart;
-    });
-
-    if (overlaps) {
-      return NextResponse.json(
-        {
-          message:
-            "That time slot has already been booked. Please choose another.",
-        },
-        { status: 409 }
-      );
-    }
-
-    const endTime = `${String(Math.floor(requestedEnd / 60)).padStart(2, "0")}:${String(requestedEnd % 60).padStart(2, "0")}`;
-
-    const appointment = await Appointment.create({
-      patientId: patient._id,
-      doctorId: doctor._id,
-      appointmentDate: date,
-      startTime,
-      endTime,
-      reason,
-      status: "scheduled",
-    });
-
-    return NextResponse.json(
-      {
-        message: "Appointment booked successfully.",
-        appointment: {
-          id: appointment._id.toString(),
-          appointmentDate: appointment.appointmentDate,
-          startTime: appointment.startTime,
-          endTime: appointment.endTime,
-          reason: appointment.reason,
-          status: appointment.status,
-        },
-      },
-      { status: 201 }
-    );
-  } catch (error) {
-    console.error("POST /api/appointments failed:", error);
-
-    return NextResponse.json(
-      { message: "Unable to book the appointment." },
-      { status: 500 }
-    );
-  }
+export async function PATCH(request: NextRequest) {
+  const auth = await requireApiUser(["patient", "doctor", "receptionist", "administrator"]); if (auth.response) return auth.response;
+  try { const body = (await request.json()) as Record<string, unknown>; const appointmentId = typeof body.appointmentId === "string" ? body.appointmentId : ""; const action = typeof body.action === "string" ? body.action : ""; if (!mongoose.isValidObjectId(appointmentId)) return NextResponse.json({ message: "A valid appointment is required." }, { status: 400 });
+    await connectDB(); const appointment = await Appointment.findById(appointmentId); if (!appointment) return NextResponse.json({ message: "Appointment not found." }, { status: 404 }); const currentUser = auth.user!; const patient = await Patient.findById(appointment.patientId).select("userId"); const doctor = await Doctor.findById(appointment.doctorId).select("userId"); const isPatientOwner = patient?.userId.toString() === currentUser.id; const isDoctorOwner = doctor?.userId.toString() === currentUser.id; const staff = currentUser.role === "receptionist" || currentUser.role === "administrator";
+    if (action === "cancel") { if (!isPatientOwner && !staff && !isDoctorOwner) return NextResponse.json({ message: "You cannot cancel this appointment." }, { status: 403 }); if (!transitions[appointment.status].includes("cancelled")) return NextResponse.json({ message: "This appointment cannot be cancelled." }, { status: 409 }); appointment.status = "cancelled"; appointment.cancelledAt = new Date(); appointment.cancelledBy = new mongoose.Types.ObjectId(currentUser.id); await appointment.save(); await createNotification({ userId: patient!.userId, type: "appointment", title: "Appointment cancelled", message: "Your appointment has been cancelled.", resourceType: "Appointment", resourceId: appointment._id }); await writeAuditLog({ actorId: currentUser.id, action: "appointment_cancelled", resourceType: "Appointment", resourceId: appointment._id }); }
+    else if (action === "reschedule") { if (!isPatientOwner && !staff) return NextResponse.json({ message: "You cannot reschedule this appointment." }, { status: 403 }); if (!activeStatuses.includes(appointment.status)) return NextResponse.json({ message: "Only scheduled appointments can be rescheduled." }, { status: 409 }); const appointmentDate = typeof body.appointmentDate === "string" ? body.appointmentDate : ""; const startTime = typeof body.startTime === "string" ? body.startTime : ""; const durationMinutes = typeof body.durationMinutes === "number" ? body.durationMinutes : appointment.durationMinutes || 30; const slot = await validateSlot(appointment.doctorId.toString(), appointmentDate, startTime, durationMinutes, appointment.id); if (slot.error) return NextResponse.json({ message: slot.error }, { status: 400 }); const end = minutes(startTime) + durationMinutes; appointment.appointmentDate = slot.date!; appointment.startTime = startTime; appointment.durationMinutes = durationMinutes; appointment.endTime = `${String(Math.floor(end / 60)).padStart(2, "0")}:${String(end % 60).padStart(2, "0")}`; appointment.status = "scheduled"; await appointment.save(); await createNotification({ userId: patient!.userId, type: "appointment", title: "Appointment rescheduled", message: `Your appointment is now scheduled for ${appointmentDate} at ${startTime}.`, resourceType: "Appointment", resourceId: appointment._id }); await createNotification({ userId: doctor!.userId, type: "appointment", title: "Appointment rescheduled", message: `An appointment was moved to ${appointmentDate} at ${startTime}.`, resourceType: "Appointment", resourceId: appointment._id }); await writeAuditLog({ actorId: currentUser.id, action: "appointment_rescheduled", resourceType: "Appointment", resourceId: appointment._id }); }
+    else if (["confirm", "complete", "no_show", "check_in"].includes(action)) { if (["confirm", "complete", "no_show"].includes(action) && !isDoctorOwner) return NextResponse.json({ message: "Only the assigned doctor can update this status." }, { status: 403 }); if (action === "check_in" && !staff) return NextResponse.json({ message: "Reception staff access is required for check-in." }, { status: 403 }); if (action === "check_in" && (!activeStatuses.includes(appointment.status) || appointment.checkedInAt)) return NextResponse.json({ message: "Only scheduled or confirmed appointments can be checked in, and each visit can be checked in once." }, { status: 409 }); const nextStatus: AppointmentStatus = action === "confirm" ? "confirmed" : action === "complete" ? "completed" : action === "no_show" ? "no_show" : appointment.status; if (action !== "check_in" && !transitions[appointment.status].includes(nextStatus)) return NextResponse.json({ message: "That appointment status transition is not allowed." }, { status: 409 }); if (action !== "check_in") appointment.status = nextStatus; if (action === "check_in") appointment.checkedInAt = new Date(); if (action === "confirm") appointment.confirmedAt = new Date(); if (action === "complete") appointment.completedAt = new Date(); await appointment.save(); await createNotification({ userId: patient!.userId, type: "appointment", title: `Appointment ${action.replace("_", " ")}`, message: `Your appointment status is now ${action.replace("_", " ")}.`, resourceType: "Appointment", resourceId: appointment._id }); await writeAuditLog({ actorId: currentUser.id, action: `appointment_${action}`, resourceType: "Appointment", resourceId: appointment._id }); }
+    else return NextResponse.json({ message: "Unsupported appointment action." }, { status: 400 });
+    return NextResponse.json({ message: "Appointment updated successfully.", appointment: serialize(appointment) });
+  } catch (error) { console.error("PATCH /api/appointments failed:", error); return NextResponse.json({ message: "Unable to update the appointment." }, { status: 500 }); }
 }
