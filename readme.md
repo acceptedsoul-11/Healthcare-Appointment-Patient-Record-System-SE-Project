@@ -14,8 +14,8 @@ A software system for managing healthcare appointments and maintaining patient m
 | PES ID | Role |
 |---|---|
 | PES1UG24AM240 | Developer and Team Lead |
-| PES1UG24AM251 | Product Owner |
-| PES1UG24AM252 | Test Engineer |
+| PES1UG24AM251 | Test Engineer |
+| PES1UG24AM252 | Product Owner |
 | PES1UG24AM293 | QA Lead |
 
 ## Versioning
