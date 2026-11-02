@@ -12,7 +12,7 @@ describe("Appointment authorization", () => {
 
     expect(response.status).toBe(401);
     await expect(response.json()).resolves.toEqual({
-      message: "Please sign in to view appointments.",
+      message: "Authentication required.",
     });
   });
 });
