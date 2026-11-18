@@ -42,7 +42,8 @@ export async function PATCH(request: NextRequest) {
     if (fullName.length < 2 || fullName.length > 100 || phone.length > 20 || address.length > 300 || !["male", "female", "other", "prefer_not_to_say"].includes(gender)) {
       return NextResponse.json({ message: "Please check your profile details." }, { status: 400 });
     }
-    if (dateOfBirth && (Number.isNaN(new Date(`${dateOfBirth}T00:00:00.000Z`).getTime()) || new Date(dateOfBirth) > new Date())) {
+    const birthDate = new Date(`${dateOfBirth}T00:00:00.000Z`);
+    if (dateOfBirth && (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) || Number.isNaN(birthDate.getTime()) || birthDate.toISOString().slice(0, 10) !== dateOfBirth || birthDate > new Date())) {
       return NextResponse.json({ message: "Enter a valid date of birth." }, { status: 400 });
     }
     const emergencyContact = {
@@ -52,7 +53,7 @@ export async function PATCH(request: NextRequest) {
     };
     await connectDB();
     await User.findByIdAndUpdate(currentUser.id, { fullName });
-    const dateValue = dateOfBirth ? new Date(`${dateOfBirth}T00:00:00.000Z`) : null;
+    const dateValue = dateOfBirth ? birthDate : null;
     const optional = { phone, address, dateOfBirth: dateValue, emergencyContact };
     const cleared = [
       ...(!phone ? ["phone"] : []),
