@@ -22,6 +22,7 @@ export default function FindDoctorsPage() {
   const [query, setQuery] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading] = useState(true);
+  const [failedPhotos, setFailedPhotos] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -55,9 +56,9 @@ export default function FindDoctorsPage() {
     (doctor) =>
       (!specialization ||
         doctor.specialization === specialization) &&
-      `${doctor.name} ${doctor.specialization}`
+      `${doctor.name} ${doctor.specialization} ${doctor.qualification.join(" ")}`
         .toLowerCase()
-        .includes(query.toLowerCase())
+        .includes(query.trim().toLowerCase())
   );
 
   return (
@@ -85,7 +86,7 @@ export default function FindDoctorsPage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by doctor name or specialty"
+              placeholder="Search by name, specialty or qualification"
               aria-label="Search doctors"
               className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-500"
             />
@@ -130,6 +131,11 @@ export default function FindDoctorsPage() {
                   ? "Try another name or specialty."
                   : "Approved doctor profiles will appear here once available."}
               </p>
+              {doctors.length > 0 && (query || specialization) && (
+                <button type="button" className="mt-4 font-bold text-blue-700" onClick={() => { setQuery(""); setSpecialization(""); }}>
+                  Clear filters
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -139,12 +145,13 @@ export default function FindDoctorsPage() {
                   className="cw-card overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
                 >
                   <div className="flex min-h-36 items-center gap-4 bg-blue-50 p-5">
-                    {doctor.profileImageUrl ? (
+                    {doctor.profileImageUrl && failedPhotos[doctor.id] !== doctor.profileImageUrl ? (
                       <Image
                         src={doctor.profileImageUrl}
-                        alt={`Dr. ${doctor.name}`}
+                        alt=""
                         width={80}
                         height={80}
+                        onError={() => setFailedPhotos((photos) => ({ ...photos, [doctor.id]: doctor.profileImageUrl }))}
                         unoptimized
                         className="h-20 w-20 rounded-2xl object-cover"
                       />
@@ -195,6 +202,7 @@ export default function FindDoctorsPage() {
 
                       <Link
                         href={`/appointments?doctorId=${doctor.id}`}
+                        aria-label={`Book with Dr. ${doctor.name}`}
                         className="cw-primary rounded-xl px-4 py-2.5 text-sm font-bold"
                       >
                         Book

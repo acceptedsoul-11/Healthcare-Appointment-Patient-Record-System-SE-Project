@@ -30,8 +30,12 @@ export async function PATCH(request: NextRequest) {
   if (!currentUser || currentUser.role !== "patient") {
     return NextResponse.json({ message: "Patient access is required." }, { status: 403 });
   }
+  const payload: unknown = await request.json().catch(() => null);
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ message: "Provide valid profile details." }, { status: 400 });
+  }
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = payload as Record<string, unknown>;
     const fullName = typeof body.fullName === "string" ? body.fullName.trim() : "";
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const address = typeof body.address === "string" ? body.address.trim() : "";
@@ -42,7 +46,8 @@ export async function PATCH(request: NextRequest) {
     if (fullName.length < 2 || fullName.length > 100 || phone.length > 20 || address.length > 300 || !["male", "female", "other", "prefer_not_to_say"].includes(gender)) {
       return NextResponse.json({ message: "Please check your profile details." }, { status: 400 });
     }
-    if (dateOfBirth && (Number.isNaN(new Date(`${dateOfBirth}T00:00:00.000Z`).getTime()) || new Date(dateOfBirth) > new Date())) {
+    const birthDate = new Date(`${dateOfBirth}T00:00:00.000Z`);
+    if (dateOfBirth && (!/^\d{4}-\d{2}-\d{2}$/.test(dateOfBirth) || Number.isNaN(birthDate.getTime()) || birthDate.toISOString().slice(0, 10) !== dateOfBirth || birthDate > new Date())) {
       return NextResponse.json({ message: "Enter a valid date of birth." }, { status: 400 });
     }
     const emergencyContact = {
@@ -52,14 +57,19 @@ export async function PATCH(request: NextRequest) {
     };
     await connectDB();
     await User.findByIdAndUpdate(currentUser.id, { fullName });
+    const dateValue = dateOfBirth ? birthDate : null;
+    const optional = { phone, address, dateOfBirth: dateValue, emergencyContact };
+    const cleared = [
+      ...(!phone ? ["phone"] : []),
+      ...(!address ? ["address"] : []),
+      ...(!dateValue ? ["dateOfBirth"] : []),
+      ...(!Object.values(emergencyContact).some(Boolean) ? ["emergencyContact"] : []),
+    ];
     await Patient.findOneAndUpdate(
       { userId: currentUser.id },
       {
-        phone: phone || undefined,
-        address: address || undefined,
-        dateOfBirth: dateOfBirth ? new Date(`${dateOfBirth}T00:00:00.000Z`) : undefined,
-        gender,
-        emergencyContact: emergencyContact.name || emergencyContact.phone ? emergencyContact : undefined,
+        $set: { gender, ...Object.fromEntries(Object.entries(optional).filter(([field]) => !cleared.includes(field))) },
+        $unset: Object.fromEntries(cleared.map((field) => [field, 1])),
       },
       { returnDocument: "after" }
     );
