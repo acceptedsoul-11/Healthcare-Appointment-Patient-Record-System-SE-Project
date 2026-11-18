@@ -16,3 +16,14 @@ it.each([["POST", POST], ["PATCH", PATCH]] as const)(
     expect(response.status).toBe(401);
   },
 );
+
+it.each([["POST", POST], ["PATCH", PATCH]] as const)(
+  "rejects malformed JSON and non-object bodies for %s",
+  async (method, handler) => {
+    auth.user = { id: "000000000000000000000001", role: "patient" };
+    for (const body of ["{", "null", "[]", '"invalid"']) {
+      const response = await handler(new NextRequest(endpoint, { method, body }));
+      expect(response.status).toBe(400);
+    }
+  },
+);
