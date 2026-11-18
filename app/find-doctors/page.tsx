@@ -131,6 +131,11 @@ export default function FindDoctorsPage() {
                   ? "Try another name or specialty."
                   : "Approved doctor profiles will appear here once available."}
               </p>
+              {doctors.length > 0 && (query || specialization) && (
+                <button type="button" className="mt-4 font-bold text-blue-700" onClick={() => { setQuery(""); setSpecialization(""); }}>
+                  Clear filters
+                </button>
+              )}
             </div>
           ) : (
             <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
