@@ -202,6 +202,7 @@ export default function FindDoctorsPage() {
 
                       <Link
                         href={`/appointments?doctorId=${doctor.id}`}
+                        aria-label={`Book with Dr. ${doctor.name}`}
                         className="cw-primary rounded-xl px-4 py-2.5 text-sm font-bold"
                       >
                         Book
