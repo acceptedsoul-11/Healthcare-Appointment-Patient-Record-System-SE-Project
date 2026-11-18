@@ -11,7 +11,7 @@ const hospitalTimeZone = "Asia/Kolkata";
 const dateInHospital = new Intl.DateTimeFormat("sv-SE", { timeZone: hospitalTimeZone, year: "numeric", month: "2-digit", day: "2-digit" });
 const timeInHospital = new Intl.DateTimeFormat("en-GB", { timeZone: hospitalTimeZone, hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
 function localDate() { return dateInHospital.format(new Date()); }
-function formatDate(value: string) { return new Date(value).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }); }
+function formatDate(value: string) { return new Date(value).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: hospitalTimeZone }); }
 function slotsFor(doctor: Doctor, date: string) { if (!date || date < localDate()) return []; const weekday = new Date(`${date}T12:00:00`).getDay(); const slot = doctor.availability.find((item) => item.dayOfWeek === weekday); if (!slot) return []; const [startHour, startMinute] = slot.startTime.split(":").map(Number); const [endHour, endMinute] = slot.endTime.split(":").map(Number); const slots: string[] = []; const now = new Date(); const [hour, minute] = timeInHospital.format(now).split(":").map(Number); for (let value = startHour * 60 + startMinute; value + 30 <= endHour * 60 + endMinute; value += 30) { if (date === dateInHospital.format(now) && value <= hour * 60 + minute) continue; slots.push(`${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`); } return slots; }
 
 function AppointmentsContent() {
