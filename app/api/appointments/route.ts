@@ -14,6 +14,7 @@ const activeStatuses: AppointmentStatus[] = ["scheduled", "confirmed"];
 const transitions: Record<AppointmentStatus, AppointmentStatus[]> = { scheduled: ["confirmed", "cancelled", "no_show"], confirmed: ["completed", "cancelled", "no_show"], completed: [], cancelled: [], no_show: [] };
 
 function minutes(value: string) { const [hour, minute] = value.split(":").map(Number); return hour * 60 + minute; }
+function formatAppointmentTime(value: number) { return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`; }
 function dateOnly(value: string) { if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null; const date = new Date(`${value}T00:00:00.000Z`); return Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== value ? null : date; }
 function isFutureInHospitalTime(dateValue: string, startTime: string) { const [year, month, day] = dateValue.split("-").map(Number); const [hour, minute] = startTime.split(":").map(Number); return new Date(Date.UTC(year, month - 1, day, hour - 5, minute - 30)) > new Date(); }
 
@@ -35,8 +36,10 @@ async function validateSlot(doctorId: string, appointmentDate: string, startTime
   if (start < minutes(slot.startTime) || end > minutes(slot.endTime)) return { error: "The selected time is outside the doctor's available hours." };
   const conflictFilter: Record<string, unknown> = { doctorId, appointmentDate: date, status: { $in: activeStatuses } };
   if (excludeId) conflictFilter._id = { $ne: excludeId };
-  const conflicting = await Appointment.findOne(conflictFilter).select("startTime endTime").lean();
-  if (conflicting && start < minutes(conflicting.endTime) && end > minutes(conflicting.startTime)) return { error: "That time slot has already been booked. Please choose another." };
+  conflictFilter.startTime = { $lt: formatAppointmentTime(end) };
+  conflictFilter.endTime = { $gt: startTime };
+  const conflicting = await Appointment.exists(conflictFilter);
+  if (conflicting) return { error: "That time slot has already been booked. Please choose another." };
   return { date, doctor };
 }
 
