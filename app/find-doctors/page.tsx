@@ -56,9 +56,9 @@ export default function FindDoctorsPage() {
     (doctor) =>
       (!specialization ||
         doctor.specialization === specialization) &&
-      `${doctor.name} ${doctor.specialization}`
+      `${doctor.name} ${doctor.specialization} ${doctor.qualification.join(" ")}`
         .toLowerCase()
-        .includes(query.toLowerCase())
+        .includes(query.trim().toLowerCase())
   );
 
   return (
@@ -86,7 +86,7 @@ export default function FindDoctorsPage() {
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by doctor name or specialty"
+              placeholder="Search by name, specialty or qualification"
               aria-label="Search doctors"
               className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-500"
             />
