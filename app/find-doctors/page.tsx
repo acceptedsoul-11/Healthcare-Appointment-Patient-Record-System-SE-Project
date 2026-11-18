@@ -22,6 +22,7 @@ export default function FindDoctorsPage() {
   const [query, setQuery] = useState("");
   const [specialization, setSpecialization] = useState("");
   const [loading, setLoading] = useState(true);
+  const [failedPhotos, setFailedPhotos] = useState<Record<string, string>>({});
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -139,12 +140,13 @@ export default function FindDoctorsPage() {
                   className="cw-card overflow-hidden rounded-2xl transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-md"
                 >
                   <div className="flex min-h-36 items-center gap-4 bg-blue-50 p-5">
-                    {doctor.profileImageUrl ? (
+                    {doctor.profileImageUrl && failedPhotos[doctor.id] !== doctor.profileImageUrl ? (
                       <Image
                         src={doctor.profileImageUrl}
-                        alt={`Dr. ${doctor.name}`}
+                        alt=""
                         width={80}
                         height={80}
+                        onError={() => setFailedPhotos((photos) => ({ ...photos, [doctor.id]: doctor.profileImageUrl }))}
                         unoptimized
                         className="h-20 w-20 rounded-2xl object-cover"
                       />
