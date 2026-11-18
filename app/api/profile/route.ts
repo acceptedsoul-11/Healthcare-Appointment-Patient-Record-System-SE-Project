@@ -52,14 +52,19 @@ export async function PATCH(request: NextRequest) {
     };
     await connectDB();
     await User.findByIdAndUpdate(currentUser.id, { fullName });
+    const dateValue = dateOfBirth ? new Date(`${dateOfBirth}T00:00:00.000Z`) : null;
+    const optional = { phone, address, dateOfBirth: dateValue, emergencyContact };
+    const cleared = [
+      ...(!phone ? ["phone"] : []),
+      ...(!address ? ["address"] : []),
+      ...(!dateValue ? ["dateOfBirth"] : []),
+      ...(!Object.values(emergencyContact).some(Boolean) ? ["emergencyContact"] : []),
+    ];
     await Patient.findOneAndUpdate(
       { userId: currentUser.id },
       {
-        phone: phone || undefined,
-        address: address || undefined,
-        dateOfBirth: dateOfBirth ? new Date(`${dateOfBirth}T00:00:00.000Z`) : undefined,
-        gender,
-        emergencyContact: emergencyContact.name || emergencyContact.phone ? emergencyContact : undefined,
+        $set: { gender, ...Object.fromEntries(Object.entries(optional).filter(([field]) => !cleared.includes(field))) },
+        $unset: Object.fromEntries(cleared.map((field) => [field, 1])),
       },
       { returnDocument: "after" }
     );
