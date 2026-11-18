@@ -61,7 +61,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   const auth = await requireApiUser(["patient", "receptionist"]); if (auth.response) return auth.response;
-  try { const body = (await request.json()) as Record<string, unknown>; const doctorId = typeof body.doctorId === "string" ? body.doctorId.trim() : ""; const appointmentDate = typeof body.appointmentDate === "string" ? body.appointmentDate.trim() : ""; const startTime = typeof body.startTime === "string" ? body.startTime.trim() : ""; const reason = typeof body.reason === "string" ? body.reason.trim() : ""; const durationMinutes = typeof body.durationMinutes === "number" ? body.durationMinutes : 30;
+  const payload: unknown = await request.json().catch(() => null);
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ message: "Provide valid appointment details." }, { status: 400 });
+  }
+  try { const body = payload as Record<string, unknown>; const doctorId = typeof body.doctorId === "string" ? body.doctorId.trim() : ""; const appointmentDate = typeof body.appointmentDate === "string" ? body.appointmentDate.trim() : ""; const startTime = typeof body.startTime === "string" ? body.startTime.trim() : ""; const reason = typeof body.reason === "string" ? body.reason.trim() : ""; const durationMinutes = typeof body.durationMinutes === "number" ? body.durationMinutes : 30;
     if (!mongoose.isValidObjectId(doctorId) || !reason || reason.length > 500) return NextResponse.json({ message: "Doctor and a valid reason are required." }, { status: 400 });
     const slot = await validateSlot(doctorId, appointmentDate, startTime, durationMinutes); if (slot.error) return NextResponse.json({ message: slot.error }, { status: 400 });
     let patientId: mongoose.Types.ObjectId | undefined; if (auth.user!.role === "patient") { const patient = await Patient.findOne({ userId: auth.user!.id }).select("_id"); patientId = patient?._id; } else if (typeof body.patientId === "string" && mongoose.isValidObjectId(body.patientId)) patientId = new mongoose.Types.ObjectId(body.patientId);
