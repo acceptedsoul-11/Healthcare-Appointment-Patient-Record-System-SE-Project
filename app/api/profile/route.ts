@@ -30,8 +30,12 @@ export async function PATCH(request: NextRequest) {
   if (!currentUser || currentUser.role !== "patient") {
     return NextResponse.json({ message: "Patient access is required." }, { status: 403 });
   }
+  const payload: unknown = await request.json().catch(() => null);
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ message: "Provide valid profile details." }, { status: 400 });
+  }
   try {
-    const body = (await request.json()) as Record<string, unknown>;
+    const body = payload as Record<string, unknown>;
     const fullName = typeof body.fullName === "string" ? body.fullName.trim() : "";
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const address = typeof body.address === "string" ? body.address.trim() : "";
