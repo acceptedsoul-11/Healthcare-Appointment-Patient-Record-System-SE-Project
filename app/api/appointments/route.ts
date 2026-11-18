@@ -26,6 +26,7 @@ async function validateSlot(doctorId: string, appointmentDate: string, startTime
   if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(startTime)) return { error: "Invalid appointment time." };
   if (!Number.isInteger(durationMinutes) || durationMinutes < 15 || durationMinutes > 240) return { error: "Appointment duration must be between 15 and 240 minutes." };
   if (!isFutureInHospitalTime(appointmentDate, startTime)) return { error: "Please select a future appointment date and time." };
+  await connectDB();
   const doctor = await Doctor.findById(doctorId);
   if (!doctor) return { error: "The selected doctor was not found." };
   const doctorUser = await User.findById(doctor.userId).select("isActive accountStatus");
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
   const auth = await requireApiUser(["patient", "receptionist"]); if (auth.response) return auth.response;
   try { const body = (await request.json()) as Record<string, unknown>; const doctorId = typeof body.doctorId === "string" ? body.doctorId.trim() : ""; const appointmentDate = typeof body.appointmentDate === "string" ? body.appointmentDate.trim() : ""; const startTime = typeof body.startTime === "string" ? body.startTime.trim() : ""; const reason = typeof body.reason === "string" ? body.reason.trim() : ""; const durationMinutes = typeof body.durationMinutes === "number" ? body.durationMinutes : 30;
     if (!mongoose.isValidObjectId(doctorId) || !reason || reason.length > 500) return NextResponse.json({ message: "Doctor and a valid reason are required." }, { status: 400 });
-    await connectDB(); const slot = await validateSlot(doctorId, appointmentDate, startTime, durationMinutes); if (slot.error) return NextResponse.json({ message: slot.error }, { status: 400 });
+    const slot = await validateSlot(doctorId, appointmentDate, startTime, durationMinutes); if (slot.error) return NextResponse.json({ message: slot.error }, { status: 400 });
     let patientId: mongoose.Types.ObjectId | undefined; if (auth.user!.role === "patient") { const patient = await Patient.findOne({ userId: auth.user!.id }).select("_id"); patientId = patient?._id; } else if (typeof body.patientId === "string" && mongoose.isValidObjectId(body.patientId)) patientId = new mongoose.Types.ObjectId(body.patientId);
     if (!patientId || !(await Patient.exists({ _id: patientId }))) return NextResponse.json({ message: "A valid patient is required." }, { status: 400 });
     const end = minutes(startTime) + durationMinutes; const appointment = await Appointment.create({ patientId, doctorId, appointmentDate: slot.date, startTime, endTime: formatAppointmentTime(end), durationMinutes, reason, status: "scheduled" });
