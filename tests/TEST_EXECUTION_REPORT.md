@@ -38,6 +38,22 @@ The following core checks passed in the local browser with the database connecte
 - A logged-out user receives an authentication message for medical records.
 - A demo doctor can enter the doctor workspace and view assigned patient data.
 
+## Latest automated execution - 19 Nov 2026
+
+This dated section supersedes the older counts above for the current code branch. The older browser claims and screenshots are inherited repository history, not checks repeated during this execution.
+
+| Check | Result |
+| --- | --- |
+| `npm test` | Passed: 9 files, 26 tests, 0 failures |
+| `npm run typecheck` | Passed: no diagnostics |
+| `npm run test:coverage` | Passed: 9 files, 26 tests; statements/lines 14.24%, branches 36.76%, functions 23.07% |
+| `npm run build` | Passed; four dynamic filesystem tracing warnings in doctor-photo/medical-report routes |
+| Production HTTP smoke | Passed: GET `/login` returned 200; GET `/api/appointments` and `/api/records` returned 401 without a session |
+
+The automated suite uses mocked MongoDB model calls and synthetic test values only. Valid login, signed-token verification, logout cookie clearing, invalid registration API payloads, profile authorization, doctor availability, booking conflict/unavailable/past slot handling, booking success, reschedule, cancellation, record ownership, and prescription validation passed. No real database transaction or browser interaction was run. Therefore valid account persistence, cross-page session refresh, UI defect retests, and live dashboards remain untested in this execution. No tests failed; the four build messages are warnings.
+
+See `REGRESSION_EVIDENCE.md` for test-to-commit mapping and the known unverified defect reports.
+
 ## Sign-off Notes
 
 Appointment-conflict and unavailable/past-slot scenarios remain not run because a deterministic second-account or unavailable-slot setup was not available. Automated coverage completed successfully: 8 tests passed; statements 8.85%, branches 5.74%, functions 3.00%, and lines 8.85%.

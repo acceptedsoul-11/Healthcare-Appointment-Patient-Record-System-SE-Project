@@ -46,3 +46,9 @@ Core patient and doctor workflows were successfully validated. The open defects 
 | Doctor workspace | ![Doctor dashboard](evidence/doctor-dashboard.png) |
 | Broken doctor images defect | ![Broken doctor images](evidence/doctor-directory-images.png) |
 | Add-medicine defect | ![Add medicine defect](evidence/add-medicine-defect.png) |
+
+## Current automated system validation - 19 Nov 2026
+
+The current execution covers the API workflows listed in `TEST_CASES.md`. The route handlers ran with mocked database models and synthetic inputs; this provides deterministic request/response regression evidence but does not establish live MongoDB integration or browser behavior. The repository's existing screenshots are inherited artifacts and were not captured or revalidated in this execution.
+
+The production build smoke test passed. It emitted four Turbopack warnings about dynamic filesystem paths in doctor photo and medical-report routes. Browser smoke testing, real registration persistence, and dashboard checks against a live database were not run. BUG-002 through BUG-005 remain prior reports and were not independently reproduced or fixed by this test-only change.
