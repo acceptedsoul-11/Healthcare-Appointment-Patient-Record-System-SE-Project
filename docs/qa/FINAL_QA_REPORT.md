@@ -1,5 +1,7 @@
 # Final QA Review — Member 4
 
+**Role ownership clarification:** Santhosh is the QA Lead; Sanket is the Member 3 Test Engineer responsible for the automated execution documented in `tests/TEST_EXECUTION_REPORT.md`. This review records QA findings and a release recommendation; it does not claim Santhosh's approval or sign-off.
+
 **Review date:** 19 November 2026  
 **Repository baseline reviewed:** `c82a93a` (`main`)  
 **Recommendation:** **Not ready for release (No-Go pending fixes and evidence).**

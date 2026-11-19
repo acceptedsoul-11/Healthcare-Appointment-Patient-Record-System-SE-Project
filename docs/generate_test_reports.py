@@ -125,6 +125,7 @@ def main():
         coverage_rows.append([name, str(covered), str(total), f"{percent:.2f}%"])
 
     build_pdf("unit-test-report.pdf", "Unit Test Report", "Healthcare Appointment and Patient Record System | Automated execution", [
+        ("Ownership", "Automated test execution: Sanket, Member 3 Test Engineer. QA review and release sign-off: Santhosh, QA Lead."),
         ("Execution result", [["Test files", "Tests", "Passed", "Failed", "Blocked"], [str(TEST_FILES), str(TESTS), str(PASSED), str(FAILED), str(BLOCKED)]]),
         ("Command and environment", ["Command: npm test. Vitest 3.2.7 ran in Node environment on 19 Nov 2026.", "Database calls were mocked. Test data is synthetic and uses example.test addresses and reserved fake identifiers."]),
         ("Verified areas", ["Login: signed token cookie for valid login; invalid password rejected without a cookie.", "Registration API: malformed payload rejected before database access; schema acceptance is covered separately.", "Session/logout: signed token verification and cookie clearing.", "Profile, doctor availability, appointment lifecycle, medical-record ownership, and prescription input validation."]),
@@ -132,6 +133,7 @@ def main():
     ], metrics)
 
     build_pdf("system-validation-report.pdf", "System Validation Report", "Route-level integration and final build smoke check", [
+        ("Ownership", "Automated test execution: Sanket, Member 3 Test Engineer. QA review and release sign-off: Santhosh, QA Lead."),
         ("Execution summary", [["Vitest", "Typecheck", "Production build", "Live DB / browser"], ["42 passed / 0 failed", "Passed", "Passed with warnings", "Not run"]]),
         ("Scenarios exercised", ["Valid and invalid login, signed session verification, logout cookie expiry, malformed registration API input.", "Patient-only profile authorization and owner-scoped profile update.", "Doctor availability validation; booking success, overlapping conflict, unavailable weekday, and past date rejection.", "Appointment reschedule and cancellation.", "Patient medical-record filter, wrong-doctor appointment rejection, invalid prescription fields."]),
         ("Smoke check", "npm run build completed successfully and generated all app routes. Local production HTTP checks returned 200 for GET /login and 401 for unauthenticated GET /api/appointments and /api/records. Build emitted four dynamic filesystem tracing warnings in medical-report/photo upload routes; these are recorded as warnings, not test failures."),

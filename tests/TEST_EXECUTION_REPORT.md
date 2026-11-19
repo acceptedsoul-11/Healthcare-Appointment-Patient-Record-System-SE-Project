@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | Project | Healthcare Appointment & Patient Record System |
-| Tester | Sanket |
+| Tester | Sanket (Member 3, Test Engineer) |
 | Build / commit | Local `main` after PR #35 merge |
 | Test environment | Local development |
 | Test date | 2 Nov 2026 |
@@ -39,6 +39,8 @@ The following core checks passed in the local browser with the database connecte
 - A demo doctor can enter the doctor workspace and view assigned patient data.
 
 ## Latest automated execution - 19 Nov 2026
+
+**Execution owner:** Sanket, Member 3 Test Engineer. **QA review/sign-off owner:** Santhosh, QA Lead. The results below are test execution evidence and do not represent QA lead release approval.
 
 This dated section supersedes the older counts above for the current code branch. The older browser claims and screenshots are inherited repository history, not checks repeated during this execution.
 
