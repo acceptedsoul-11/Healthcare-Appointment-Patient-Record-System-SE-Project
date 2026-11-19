@@ -25,39 +25,39 @@ Record the outcome of each executed test below. Use only fake test data.
 | API-001 | API | Unauthorized appointment request | No active session | API returns 401 and no appointment data | Pass | Automated test: `tests/appointments/appointment.authorization.test.ts` |
 | REG-TEST-001 | Regression | Retest resolved defect | A defect has been marked fixed | Original steps pass; no related regression found | Not run | |
 
-## Current automated execution - 19 Nov 2026
-
-This table supersedes the earlier status column for the automated run above. Route tests use mocked persistence and synthetic values; inherited screenshots are not counted as this run's test execution.
-
-| Test ID | Module | Scenario | Automated evidence | Current status |
-| --- | --- | --- | --- | --- |
-| AUTH-001 | Login/session | Valid login issues an HTTP-only signed session; token verifies | `auth/auth.api.test.ts` | Pass |
-| AUTH-002 | Login | Wrong password is rejected without a session cookie | `auth/auth.api.test.ts` | Pass |
-| AUTH-003 | Login/registration | Invalid login and registration payloads return 400 before DB access | `auth/auth.api.test.ts` | Pass |
-| AUTH-004 | Logout | Logout clears the session cookie with Max-Age=0 | `auth/auth.api.test.ts` | Pass |
-| REG-VAL-001 | Registration | Valid fake patient data passes registration schema | `auth/auth.validation.test.ts` | Pass |
-| REG-API-001 | Registration | Malformed registration request is rejected by the API | `auth/auth.api.test.ts` | Pass |
-| REG-DB-001 | Registration | Valid registration persists a user and patient transaction | None; MongoDB transaction not exercised | Not run |
-| PROF-API-001 | Patient profile | Unauthenticated GET/PATCH are denied before storage access | `patient-profile/profile.authorization.test.ts` | Pass |
-| PROF-API-002 | Patient profile | Non-patient role cannot update a patient profile | `patient-profile/profile.authorization.test.ts` | Pass |
-| PROF-API-003 | Patient profile | Patient update targets the session user's own user ID | `patient-profile/profile.authorization.test.ts` | Pass |
-| DOC-AV-001 | Doctor availability | Duplicate weekday and reversed hours are rejected | `appointments/doctor-availability.test.ts` | Pass |
-| DOC-AV-002 | Doctor availability | Valid availability is saved for the authenticated doctor | `appointments/doctor-availability.test.ts` | Pass |
-| DOC-DETAIL-001 | Doctor directory | Doctor details and displayed availability in UI | No browser/database fixture in this run | Not run |
-| APPT-001 | Appointment | Book an available future slot | `appointments/appointment.workflows.test.ts` | Pass |
-| APPT-002 | Appointment | Overlapping active appointment is rejected | `appointments/appointment.workflows.test.ts` | Pass |
-| APPT-003 | Appointment | Doctor unavailable on selected weekday is rejected | `appointments/appointment.workflows.test.ts` | Pass |
-| APPT-004 | Appointment | Past appointment date is rejected before doctor lookup | `appointments/appointment.workflows.test.ts` | Pass |
-| APPT-005 | Appointment | Owned appointment reschedules into a free slot | `appointments/appointment.workflows.test.ts` | Pass |
-| APPT-006 | Appointment | Patient owner cancels a scheduled appointment | `appointments/appointment.workflows.test.ts` | Pass |
-| REC-001 | Medical records | Patient record query is scoped to their own patient ID | `medical-records/records.ownership-prescription.test.ts` | Pass |
-| REC-002 | Medical records | Unauthenticated records request is denied | `medical-records/records.authorization.test.ts` | Pass |
-| REC-003 | Medical records | Doctor cannot create a record for an unassigned appointment | `medical-records/records.ownership-prescription.test.ts` | Pass |
-| RX-001 | Prescriptions | Medicine missing required fields is rejected | `medical-records/records.ownership-prescription.test.ts` | Pass |
-| SYS-001 | System smoke | Production Next.js build and local HTTP routes | `npm run build`; local GET `/login` | Pass with four tracing warnings; login returned 200 |
-| SYS-002 | System smoke | Unauthenticated appointment and medical-record API requests | Local GET `/api/appointments`, `/api/records` | Pass: both returned 401 |
-| UI-REG-001 | Browser regression | Cross-page refresh/session behavior and dashboard/API with live DB | Not executed in this run | Not run |
-
-## Current suite totals
-
-`npm test`: 9 files, 26 tests passed, 0 failed. See `TEST_EXECUTION_REPORT.md` for the dated commands, coverage totals, build result, and limits.
+| AUTH-005 | Authentication | Inactive account cannot sign in | Inactive fake user exists | Login is denied and no session cookie is issued | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-006 | Authentication | Wrong password does not establish session | Active fake patient account exists | Generic authentication failure is returned; no session is issued | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-007 | Session | Tampered session signature is rejected | Valid token is modified | Protected API returns unauthenticated outcome | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-008 | Session | Expired session is rejected | Expired fake session token is supplied | Protected API returns 401 and no patient data | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-009 | Session | Production cookie flags are secure | Production login response available | Cookie is HttpOnly, Secure, SameSite=Lax, path=/, and time-limited | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-010 | Role permissions | Unapproved doctor cannot access doctor functions | Fake doctor has pending or rejected account status | Privileged request is denied | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-011 | Role permissions | Role matrix rejects disallowed API actions | Fake patient, doctor, receptionist, and administrator accounts exist | Each action accepts only documented roles | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-012 | Authentication API | Malformed JSON is rejected before database access | Malformed login body is submitted | 400 response; database is not queried | Not run | Follow-up scenario; execution evidence pending. |
+| PROF-003 | Patient profile | Unauthenticated profile mutation is denied server-side | No active session | 401 response; no database mutation occurs | Not run | Follow-up scenario; execution evidence pending. |
+| PROF-004 | Patient profile | Invalid and future birth dates are rejected | Authenticated fake patient submits invalid date | 400 response; stored profile remains unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| PROF-005 | Patient profile | Overlong and malformed fields are rejected | Authenticated fake patient submits boundary values | Validation error; no unapproved field is persisted | Not run | Follow-up scenario; execution evidence pending. |
+| PROF-006 | Patient privacy | Profile query is scoped to authenticated patient | Two synthetic patients exist | Response contains only the current patient profile | Not run | Follow-up scenario; execution evidence pending. |
+| PRIV-001 | Database privacy | Database failure response omits credentials and records | Database connection is unavailable | Public response contains no connection string or patient information | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-007 | Appointment | Overlapping active booking is rejected | Fake doctor has an active overlapping appointment | Request fails and existing booking remains unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-008 | Appointment | Adjacent booking is accepted | Fake doctor has a slot ending at requested start | No overlap error is returned | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-009 | Appointment | Cancelled booking does not block a free slot | Only cancelled appointment occupies the interval | New valid booking is accepted | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-010 | Appointment | Reschedule excludes its own appointment from conflicts | Patient owns a scheduled appointment and selects its current interval | Request does not conflict with itself | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-011 | Appointment permissions | Patient cannot cancel another patient booking | Fake patient is not the appointment owner | 403 response; appointment state is unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-012 | Appointment permissions | Patient cannot reschedule another patient booking | Fake patient is not the appointment owner | 403 response; appointment state is unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-013 | Appointment permissions | Only assigned doctor can confirm or complete visit | Fake doctor is not assigned to the appointment | 403 response; appointment state is unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-014 | Appointment permissions | Only receptionist or administrator can check in | Fake patient or doctor attempts check-in | 403 response; check-in timestamp is absent | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-015 | Appointment state | Repeated check-in is rejected | Appointment already has a check-in timestamp | 409 response; original timestamp is preserved | Not run | Follow-up scenario; execution evidence pending. |
+| APPT-016 | Appointment integrity | Concurrent overlapping requests cannot double-book | Two requests target the same doctor/time simultaneously | At most one active booking is created | Not run | Follow-up scenario; execution evidence pending. |
+| REC-003 | Medical records privacy | Patient cannot retrieve another patients record | Two synthetic patients have separate records | Patient receives only their own records | Not run | Follow-up scenario; execution evidence pending. |
+| REC-004 | Medical records permissions | Doctor sees only records for assigned patients | Two doctors and synthetic records exist | Doctor response is scoped to assigned patients | Not run | Follow-up scenario; execution evidence pending. |
+| REC-005 | Medical records permissions | Unassigned doctor cannot edit a record | Doctor is not assigned to record owner appointment | 403 response; record and prescription are unchanged | Not run | Follow-up scenario; execution evidence pending. |
+| REC-006 | Medical records permissions | Patient cannot create or edit doctor-authored record | Fake patient submits record mutation | 403 response; no record write occurs | Not run | Follow-up scenario; execution evidence pending. |
+| RX-002 | Prescription permissions | Reception role sees only approved prescription fields | Fake receptionist requests prescription list | Response contains workflow-required data only | Not run | Follow-up scenario; execution evidence pending. |
+| RPT-001 | Medical reports privacy | Patient can download own report only | Patient owns a synthetic report | Download succeeds with private no-store response headers | Not run | Follow-up scenario; execution evidence pending. |
+| RPT-002 | Medical reports permissions | Unassigned doctor cannot download patient report | Doctor has no appointment with report owner | 403 response; private file is not read | Not run | Follow-up scenario; execution evidence pending. |
+| AUD-001 | Audit logging | Successful appointment booking persists audit event | Valid fake booking completes | Audit event contains actor, action, resource, and role only | Not run | Follow-up scenario; execution evidence pending. |
+| AUD-002 | Audit logging | Medical-record edit persists audit event | Assigned doctor edits synthetic record | Audit event identifies actor/action/resource/version | Not run | Follow-up scenario; execution evidence pending. |
+| AUD-003 | Audit privacy | Audit metadata omits secrets and clinical narrative | Successful record and appointment mutations are executed | No password, token, diagnosis, or treatment text appears in audit metadata | Not run | Follow-up scenario; execution evidence pending. |
+| REL-001 | Regression | BUG-002 logged-out profile form is retested after fix | Fix is merged and fresh local environment is available | User is redirected or controls cannot submit; server remains protected | Not run | Follow-up scenario; execution evidence pending. |
+| REL-002 | Regression | BUG-003 prescription row creation is retested after fix | Fix is merged and assigned doctor test account is available | Add-medicine creates an editable row and record persists | Not run | Follow-up scenario; execution evidence pending. |
+| REL-003 | Regression | BUG-005 logged-out appointment form is retested after fix | Fix is merged and fresh local environment is available | Booking controls are disabled or redirected; forged API call remains denied | Not run | Follow-up scenario; execution evidence pending. |
