@@ -53,8 +53,11 @@ describe("Patient profile authorization", () => {
     expect(userModel.findByIdAndUpdate).toHaveBeenCalledWith("64b000000000000000000001", { fullName: "Synthetic Patient" });
     expect(patientModel.findOneAndUpdate).toHaveBeenCalledWith(
       { userId: "64b000000000000000000001" },
-      expect.objectContaining({ phone: "5550101" }),
-      expect.any(Object),
+      {
+        $set: { phone: "5550101", gender: "prefer_not_to_say" },
+        $unset: { address: 1, dateOfBirth: 1, emergencyContact: 1 },
+      },
+      { returnDocument: "after" },
     );
   });
 });

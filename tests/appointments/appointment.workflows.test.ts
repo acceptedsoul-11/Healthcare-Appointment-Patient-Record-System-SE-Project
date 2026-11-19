@@ -5,7 +5,7 @@ vi.mock("@/lib/api-auth", () => ({ requireApiUser: vi.fn() }));
 vi.mock("@/lib/mongodb", () => ({ connectDB: vi.fn() }));
 vi.mock("@/lib/notifications", () => ({ createNotification: vi.fn() }));
 vi.mock("@/lib/audit", () => ({ writeAuditLog: vi.fn() }));
-vi.mock("@/models/Appointment", () => ({ default: { findOne: vi.fn(), findById: vi.fn(), create: vi.fn() } }));
+vi.mock("@/models/Appointment", () => ({ default: { exists: vi.fn(), findById: vi.fn(), create: vi.fn() } }));
 vi.mock("@/models/Doctor", () => ({ default: { findById: vi.fn() } }));
 vi.mock("@/models/Patient", () => ({ default: { findOne: vi.fn(), findById: vi.fn(), exists: vi.fn() } }));
 vi.mock("@/models/User", () => ({ default: { findById: vi.fn() } }));
@@ -40,9 +40,7 @@ function configureSlot({ availableDay = 1, conflict = null }: { availableDay?: n
   };
   doctorModel.findById.mockReturnValue(doctor);
   userModel.findById.mockReturnValue({ select: vi.fn().mockResolvedValue({ isActive: true, accountStatus: "approved" }) });
-  appointmentModel.findOne.mockReturnValue({ select: vi.fn().mockReturnValue({
-    lean: vi.fn().mockResolvedValue(conflict),
-  }) });
+  appointmentModel.exists.mockResolvedValue(conflict ? { _id: "64b000000000000000000021" } : null);
 }
 
 function currentAppointment() {
@@ -107,7 +105,7 @@ describe("Appointment API workflows", () => {
 
     expect(response.status).toBe(400);
     expect((await response.json()).message).toContain("not available on the selected day");
-    expect(appointmentModel.findOne).not.toHaveBeenCalled();
+    expect(appointmentModel.exists).not.toHaveBeenCalled();
   });
 
   it("rejects past appointments before reading doctor availability", async () => {
