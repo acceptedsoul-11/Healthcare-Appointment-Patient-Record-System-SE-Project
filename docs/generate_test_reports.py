@@ -19,9 +19,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "docs"
 COVERAGE_FILE = ROOT / "coverage" / "coverage-final.json"
 RUN_DATE = date(2026, 11, 19).strftime("%d %b %Y")
-TEST_FILES = 9
-TESTS = 26
-PASSED = 26
+TEST_FILES = 12
+TESTS = 42
+PASSED = 42
 FAILED = 0
 BLOCKED = 0
 
@@ -132,7 +132,7 @@ def main():
     ], metrics)
 
     build_pdf("system-validation-report.pdf", "System Validation Report", "Route-level integration and final build smoke check", [
-        ("Execution summary", [["Vitest", "Typecheck", "Production build", "Live DB / browser"], ["26 passed / 0 failed", "Passed", "Passed with warnings", "Not run"]]),
+        ("Execution summary", [["Vitest", "Typecheck", "Production build", "Live DB / browser"], ["42 passed / 0 failed", "Passed", "Passed with warnings", "Not run"]]),
         ("Scenarios exercised", ["Valid and invalid login, signed session verification, logout cookie expiry, malformed registration API input.", "Patient-only profile authorization and owner-scoped profile update.", "Doctor availability validation; booking success, overlapping conflict, unavailable weekday, and past date rejection.", "Appointment reschedule and cancellation.", "Patient medical-record filter, wrong-doctor appointment rejection, invalid prescription fields."]),
         ("Smoke check", "npm run build completed successfully and generated all app routes. Local production HTTP checks returned 200 for GET /login and 401 for unauthenticated GET /api/appointments and /api/records. Build emitted four dynamic filesystem tracing warnings in medical-report/photo upload routes; these are recorded as warnings, not test failures."),
         ("Not validated", ["Live MongoDB transactions, real account persistence, browser navigation/session refresh, and live notification/audit side effects.", "Prior screenshots in tests/evidence are inherited repository artifacts and were not captured or revalidated in this run."]),
@@ -140,7 +140,7 @@ def main():
 
     build_pdf("code-coverage-report.pdf", "Code Coverage Report", "Vitest v8 coverage across the repository", [
         ("Measured coverage", coverage_rows),
-        ("Command", "npm run test:coverage | 9 test files and 26 tests passed."),
+        ("Command", "npm run test:coverage | 12 test files and 42 tests passed."),
         ("Scope", "Coverage is measured over the whole Next.js repository, including pages and untested API routes. It is not a UI coverage percentage. The tested appointment, login, logout, doctor availability, profile, records, and auth validation handlers show per-file coverage in coverage/index.html."),
         ("Interpretation", "The aggregate statement and line percentage remains low because most pages and routes are not exercised. Coverage confirms which code executed; it does not establish correctness of untested integrations."),
     ], metrics)
@@ -150,7 +150,7 @@ def main():
         ("Branch result", branch_rows),
         ("Branches exercised", ["Valid versus invalid login and registration validation.", "Authenticated, unauthenticated, and role-denied authorization.", "Availability accepted/rejected; appointment conflict, unavailable-day and past-date branches.", "Appointment reschedule and cancellation transitions.", "Record ownership rejection and prescription validation."]),
         ("Remaining branch gaps", "The full repository includes many untested UI pages and unrelated API handlers. Error/database exception paths and successful MongoDB transaction paths remain outside this run."),
-        ("Execution", "npm run test:coverage completed with 26 passed, 0 failed. Percentages are the actual aggregate from coverage/coverage-final.json."),
+        ("Execution", "npm run test:coverage completed with 42 passed, 0 failed. Percentages are the actual aggregate from coverage/coverage-final.json."),
     ], metrics)
 
     print(f"Generated four reports in {OUTPUT}")

@@ -44,9 +44,9 @@ This dated section supersedes the older counts above for the current code branch
 
 | Check | Result |
 | --- | --- |
-| `npm test` | Passed: 9 files, 26 tests, 0 failures |
+| `npm test` | Passed: 12 files, 42 tests, 0 failures |
 | `npm run typecheck` | Passed: no diagnostics |
-| `npm run test:coverage` | Passed: 9 files, 26 tests; statements/lines 14.24%, branches 36.76%, functions 23.07% |
+| `npm run test:coverage` | Passed: 12 files, 42 tests; statements/lines 14.63%, branches 50.47%, functions 23.58% |
 | `npm run build` | Passed; four dynamic filesystem tracing warnings in doctor-photo/medical-report routes |
 | Production HTTP smoke | Passed: GET `/login` returned 200; GET `/api/appointments` and `/api/records` returned 401 without a session |
 

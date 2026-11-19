@@ -44,4 +44,8 @@ The existing test case log also marks `APPT-002` (conflicting booking) and `APPT
 
 **No-Go.** Three medium issues remain open, two appointment edge cases remain unrun, the audit/privacy review has not been freshly executed, and there is no current CI result for the baseline. Reassess after the release gates above have passing evidence or the accountable project owner records explicit risk acceptance.
 
+## PR #41 recheck addendum - 19 November 2026
+
+The feature branch was synced with current `main`, then the API tests were corrected to match the updated appointment conflict query and profile `$set`/`$unset` behavior. Local CLI results: 42 tests passed across 12 files; lint, typecheck, coverage, and production build completed successfully. Whole-repository coverage is 14.63% statements, 50.47% branches, 23.58% functions, and 14.63% lines. The build still emits four dynamic filesystem tracing warnings. These results clear the automated CI test failure; they do not close the medium UI defects or the unrun live-database, concurrency, audit, browser, and follow-up QA cases above. Final release remains No-Go until those release gates are addressed or accepted by the project owner.
+
 
