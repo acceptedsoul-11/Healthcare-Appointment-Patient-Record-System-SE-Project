@@ -26,3 +26,4 @@ Record the outcome of each executed test below. Use only fake test data.
 | REG-TEST-001 | Regression | Retest resolved defect | A defect has been marked fixed | Original steps pass; no related regression found | Not run | |
 
 | AUTH-005 | Authentication | Inactive account cannot sign in | Inactive fake user exists | Login is denied and no session cookie is issued | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-006 | Authentication | Wrong password does not establish session | Active fake patient account exists | Generic authentication failure is returned; no session is issued | Not run | Follow-up scenario; execution evidence pending. |
