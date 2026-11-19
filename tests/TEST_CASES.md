@@ -30,3 +30,4 @@ Record the outcome of each executed test below. Use only fake test data.
 | AUTH-007 | Session | Tampered session signature is rejected | Valid token is modified | Protected API returns unauthenticated outcome | Not run | Follow-up scenario; execution evidence pending. |
 | AUTH-008 | Session | Expired session is rejected | Expired fake session token is supplied | Protected API returns 401 and no patient data | Not run | Follow-up scenario; execution evidence pending. |
 | AUTH-009 | Session | Production cookie flags are secure | Production login response available | Cookie is HttpOnly, Secure, SameSite=Lax, path=/, and time-limited | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-010 | Role permissions | Unapproved doctor cannot access doctor functions | Fake doctor has pending or rejected account status | Privileged request is denied | Not run | Follow-up scenario; execution evidence pending. |
