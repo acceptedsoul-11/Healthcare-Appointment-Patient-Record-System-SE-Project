@@ -10,3 +10,14 @@ Create one entry per defect. Attach a screenshot, video, or API response when po
 | BUG-005 | Logged-out user can interact with appointment booking form | Appointments | Local development | Log out, open Appointments, and try to select booking values | User is redirected to login or booking controls are disabled | Page says sign-in is required, but the booking form and Book appointment button remain enabled | Medium | Open | `evidence/appointments-unauthorized-form.png` |
 
 Severity: **Blocker** prevents testing or core use; **High** breaks a core feature; **Medium** has a workaround; **Low** is cosmetic or minor.
+
+## Current execution status - 19 Nov 2026
+
+The defects below were already recorded with screenshots in the repository. They were not independently reproduced in the current automated run; API authorization tests do not validate whether the browser UI disables controls. No defect is marked fixed by this test work.
+
+| Defect ID | Current status | Retest evidence |
+| --- | --- | --- |
+| BUG-002 | Previously reported; not revalidated in this run | Inherited `evidence/profile-unauthorized-form.png`; browser retest not run |
+| BUG-003 | Previously reported; not revalidated in this run | Inherited `evidence/add-medicine-defect.png`; browser retest not run |
+| BUG-004 | Previously reported; not revalidated in this run | Inherited `evidence/doctor-directory-images.png`; browser retest not run |
+| BUG-005 | Previously reported; not revalidated in this run | Inherited `evidence/appointments-unauthorized-form.png`; browser retest not run |

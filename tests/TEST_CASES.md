@@ -61,3 +61,7 @@ Record the outcome of each executed test below. Use only fake test data.
 | REL-001 | Regression | BUG-002 logged-out profile form is retested after fix | Fix is merged and fresh local environment is available | User is redirected or controls cannot submit; server remains protected | Not run | Follow-up scenario; execution evidence pending. |
 | REL-002 | Regression | BUG-003 prescription row creation is retested after fix | Fix is merged and assigned doctor test account is available | Add-medicine creates an editable row and record persists | Not run | Follow-up scenario; execution evidence pending. |
 | REL-003 | Regression | BUG-005 logged-out appointment form is retested after fix | Fix is merged and fresh local environment is available | Booking controls are disabled or redirected; forged API call remains denied | Not run | Follow-up scenario; execution evidence pending. |
+
+## PR #41 CLI recheck - 19 Nov 2026
+
+After syncing the PR branch with the latest `main`, `npm test` passed with **12 files and 42 tests**. The current test suite does not complete all planned manual or live-database scenarios: follow-up role, privacy, concurrency, audit, and UI regression rows in this tracker remain **Not run**. See `TEST_EXECUTION_REPORT.md` for the command results and known limits.

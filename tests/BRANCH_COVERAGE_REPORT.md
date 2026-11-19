@@ -21,3 +21,7 @@ The command completed successfully on 2 Nov 2026: 4 test files and 8 tests passe
 ## Improvement Areas
 
 Add tests for role-based access, duplicate appointment conflicts, unavailable slots, and prescription validation after the associated bugs are fixed.
+
+## Latest measured execution - 19 Nov 2026
+
+`npm run test:coverage` completed on PR #41 after syncing the latest `main` with **42 passed, 0 failed**. Whole-repository branch coverage is **50.47%**. New branch evidence covers invalid/valid auth input, session outcomes, patient-vs-non-patient profile access, availability validation, appointment conflict/unavailable/past decisions, ownership denial, and prescription field validation. Database exceptions, successful registration persistence, and untested pages/routes remain outside this run.

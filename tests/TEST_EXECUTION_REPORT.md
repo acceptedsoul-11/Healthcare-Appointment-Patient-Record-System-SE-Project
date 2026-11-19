@@ -5,7 +5,7 @@
 | Field | Value |
 | --- | --- |
 | Project | Healthcare Appointment & Patient Record System |
-| Tester | Sanket |
+| Tester | Sanket (Member 3, Test Engineer) |
 | Build / commit | Local `main` after PR #35 merge |
 | Test environment | Local development |
 | Test date | 2 Nov 2026 |
@@ -37,6 +37,24 @@ The following core checks passed in the local browser with the database connecte
 - A signed-in patient can book, reschedule, and cancel an appointment.
 - A logged-out user receives an authentication message for medical records.
 - A demo doctor can enter the doctor workspace and view assigned patient data.
+
+## Latest automated execution - 19 Nov 2026
+
+**Execution owner:** Sanket, Member 3 Test Engineer. **QA review/sign-off owner:** Santhosh, QA Lead. The results below are test execution evidence and do not represent QA lead release approval.
+
+This dated section supersedes the older counts above for the current code branch. The older browser claims and screenshots are inherited repository history, not checks repeated during this execution.
+
+| Check | Result |
+| --- | --- |
+| `npm test` | Passed: 12 files, 42 tests, 0 failures |
+| `npm run typecheck` | Passed: no diagnostics |
+| `npm run test:coverage` | Passed: 12 files, 42 tests; statements/lines 14.63%, branches 50.47%, functions 23.58% |
+| `npm run build` | Passed; four dynamic filesystem tracing warnings in doctor-photo/medical-report routes |
+| Production HTTP smoke | Passed: GET `/login` returned 200; GET `/api/appointments` and `/api/records` returned 401 without a session |
+
+The automated suite uses mocked MongoDB model calls and synthetic test values only. Valid login, signed-token verification, logout cookie clearing, invalid registration API payloads, profile authorization, doctor availability, booking conflict/unavailable/past slot handling, booking success, reschedule, cancellation, record ownership, and prescription validation passed. No real database transaction or browser interaction was run. Therefore valid account persistence, cross-page session refresh, UI defect retests, and live dashboards remain untested in this execution. No tests failed; the four build messages are warnings.
+
+See `REGRESSION_EVIDENCE.md` for test-to-commit mapping and the known unverified defect reports.
 
 ## Sign-off Notes
 
