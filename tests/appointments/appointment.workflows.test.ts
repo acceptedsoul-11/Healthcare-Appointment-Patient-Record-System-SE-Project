@@ -63,6 +63,29 @@ describe("Appointment API workflows", () => {
     auth.mockResolvedValue({ user: { id: patientId, role: "patient" }, response: null });
   });
 
+  it("books a valid available slot for the authenticated patient", async () => {
+    configureSlot();
+    patientModel.findOne.mockReturnValue({ select: vi.fn().mockResolvedValue({ _id: patientId }) });
+    patientModel.exists.mockResolvedValue(true);
+    appointmentModel.create.mockResolvedValue({
+      _id: { toString: () => appointmentId },
+      appointmentDate: new Date(`${futureDate}T00:00:00.000Z`),
+      startTime: "09:00", endTime: "09:30", durationMinutes: 30,
+      reason: "Synthetic visit", status: "scheduled",
+      patientId: { _id: { toString: () => patientId }, userId: { fullName: "Synthetic Patient" } },
+      doctorId: { _id: { toString: () => doctorId }, userId: { fullName: "Synthetic Doctor" }, specialization: "Primary care" },
+    });
+
+    const response = await POST(request("POST", {
+      doctorId, appointmentDate: futureDate, startTime: "09:00", durationMinutes: 30, reason: "Synthetic visit",
+    }));
+
+    expect(response.status).toBe(201);
+    expect(appointmentModel.create).toHaveBeenCalledWith(expect.objectContaining({
+      startTime: "09:00", endTime: "09:30", status: "scheduled", reason: "Synthetic visit",
+    }));
+  });
+
   it("rejects an overlapping appointment for an otherwise available doctor", async () => {
     configureSlot({ conflict: { startTime: "09:00", endTime: "09:30" } });
 
