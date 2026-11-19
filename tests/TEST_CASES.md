@@ -24,3 +24,5 @@ Record the outcome of each executed test below. Use only fake test data.
 | RX-001 | Prescription | Add a new medicine to an existing prescription | Authorized doctor workflow available | A new medicine row is added for entry | Fail | BUG-003 |
 | API-001 | API | Unauthorized appointment request | No active session | API returns 401 and no appointment data | Pass | Automated test: `tests/appointments/appointment.authorization.test.ts` |
 | REG-TEST-001 | Regression | Retest resolved defect | A defect has been marked fixed | Original steps pass; no related regression found | Not run | |
+
+| AUTH-005 | Authentication | Inactive account cannot sign in | Inactive fake user exists | Login is denied and no session cookie is issued | Not run | Follow-up scenario; execution evidence pending. |
