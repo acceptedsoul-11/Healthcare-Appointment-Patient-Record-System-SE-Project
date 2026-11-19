@@ -29,3 +29,4 @@ Record the outcome of each executed test below. Use only fake test data.
 | AUTH-006 | Authentication | Wrong password does not establish session | Active fake patient account exists | Generic authentication failure is returned; no session is issued | Not run | Follow-up scenario; execution evidence pending. |
 | AUTH-007 | Session | Tampered session signature is rejected | Valid token is modified | Protected API returns unauthenticated outcome | Not run | Follow-up scenario; execution evidence pending. |
 | AUTH-008 | Session | Expired session is rejected | Expired fake session token is supplied | Protected API returns 401 and no patient data | Not run | Follow-up scenario; execution evidence pending. |
+| AUTH-009 | Session | Production cookie flags are secure | Production login response available | Cookie is HttpOnly, Secure, SameSite=Lax, path=/, and time-limited | Not run | Follow-up scenario; execution evidence pending. |
