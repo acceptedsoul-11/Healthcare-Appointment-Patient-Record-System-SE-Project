@@ -16,9 +16,9 @@ CureWell is a role-based healthcare appointment and patient-record application f
 | PES ID | Responsibility |
 |---|---|
 | PES1UG24AM240 | Developer and Team Lead |
-| PES1UG24AM251 | Product Owner |
-| PES1UG24AM252 | Test Engineer |
-| PES1UG24AM293 | QA Lead |
+| PES1UG24AM293 | Product Owner |
+| PES1UG24AM251 | Test Engineer |
+| PES1UG24AM252 | QA Lead |
 
 ## Sprint
 <img width="1774" height="887" alt="image" src="https://github.com/user-attachments/assets/c8928e9b-932f-4b75-ac9d-f5c6952a59fc" />
