@@ -8,3 +8,7 @@ The goal was to turn the Software Requirements Specification (SRS) into a develo
 I used the following priority approach:
 - P0 — Critical: Authentication and role-based access control.
 - P1 — High: Patient and doctor management, appointments, medical records, administration, and security/quality verification.
+**Day  2:-**
+  **Creation of Issues**
+  I have created issues for product server as product owner.
+  10 issues are created and then later closed by_ AM240_
